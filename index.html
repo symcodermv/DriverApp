@@ -352,7 +352,7 @@ a{color:#f39c12;text-decoration:none}
 
 <!-- NOTIFICATION PANEL -->
 <div class="n-panel" id="nPanel">
-  <div class="n-hd"><div class="n-hd-t"><i class="fas fa-bell"></i> Notifications</div><button class="n-close" id="nClose"><i class="fas fa-times"></i></button></div>
+  <div class="n-hd"><div class="n-hd-t"><i class="fas fa-bell"></i> Notifications</div><div style="display:flex;align-items:center;gap:7px"><button id="nClearAll" style="background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.22);color:#e74c3c;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:12px;cursor:pointer;font-family:inherit">Clear All</button><button class="n-close" id="nClose"><i class="fas fa-times"></i></button></div></div>
   <div class="n-list" id="nList"></div>
 </div>
 
@@ -369,10 +369,7 @@ a{color:#f39c12;text-decoration:none}
       <label><i class="fas fa-camera" style="color:#f39c12;margin-right:4px"></i>Delivery Proof Photo (Required)</label>
       <label class="upload-lbl" id="proofLbl"><i class="fas fa-camera"></i><span class="fn" id="proofFN">Tap to take photo</span><input type="file" id="proofFile" accept="image/*"></label>
     </div>
-    <div class="fg">
-      <label><i class="fas fa-receipt" style="color:#f39c12;margin-right:4px"></i>Payment Receipt (upload for admin)</label>
-      <label class="upload-lbl" id="payRcptLbl"><i class="fas fa-receipt"></i><span class="fn" id="payRcptFN">Tap to upload receipt</span><input type="file" id="payRcptFile" accept="image/*"></label>
-    </div>
+
   </div>
   <div class="modal-btns"><button class="btn btn-sec" style="flex:1" id="statCancel">Cancel</button><button class="btn btn-gold" style="flex:2" id="statConfirm"><i class="fas fa-check"></i> Update</button></div>
 </div>
@@ -448,7 +445,7 @@ window.showAuth=function(){$('homePage').style.display='none';$('authScreen').cl
 $('idFile').addEventListener('change',function(){readFile(this,'idLbl','idFN',function(r){idData=r;})});
 $('vregFile').addEventListener('change',function(){readFile(this,'vregLbl','vregFN',function(r){vregData=r;})});
 $('proofFile').addEventListener('change',function(){if(this.files[0]){$('proofFN').textContent=this.files[0].name;$('proofLbl').className='upload-lbl done';}});
-$('payRcptFile').addEventListener('change',function(){if(this.files[0]){$('payRcptFN').textContent=this.files[0].name;$('payRcptLbl').className='upload-lbl done';}});
+
 function readFile(input,lblId,fnId,cb){if(!input.files[0])return;var rd=new FileReader();rd.onload=function(e){cb(e.target.result);$(lblId).className='upload-lbl done';$(fnId).textContent=input.files[0].name;};rd.readAsDataURL(input.files[0]);}
 
 /* AUTH */
@@ -593,7 +590,7 @@ function loadProfile(){
 }
 
 function buildCard(d,canUpdate,canAccept){
-  return'<div class="del-card '+(canAccept?'open-job':canUpdate?'my-job':'my-job')+'">'+'<div class="del-ref">'+d.referenceNumber+'</div>'+'<div class="del-cust">'+d.customerName+' <a href="tel:'+d.customerContact+'" style="font-size:.7rem;color:#f39c12;margin-left:5px"><i class="fas fa-phone"></i> '+d.customerContact+'</a></div>'+'<div class="del-route"><i class="fas fa-map-marker-alt" style="color:#f39c12;margin-right:3px"></i>'+(d.pickupLocation||'')+' &rarr; '+(d.deliveryLocation||'')+'</div>'+(d.packageDescription?'<div style="font-size:.7rem;color:rgba(255,255,255,.35);margin-bottom:5px">'+d.packageDescription+'</div>':'')+'<div class="del-amt">MVR '+(d.driverAmount||0)+'</div>'+'<div style="margin-bottom:6px">'+sBadge(d.status)+'</div>'+'<div class="del-btns">'+(canAccept?'<button class="btn-accept" onclick="acceptJob('+d.id+')"><i class="fas fa-check"></i> Accept</button>':'')+(canUpdate?'<button class="btn-upd" onclick="openStat('+d.id+')"><i class="fas fa-pen"></i> Update Status</button>':'')+(canAccept?'<button class="btn-pass" onclick="passJob('+d.id+')"><i class="fas fa-times"></i> Pass</button>':'')+'</div></div>';
+  return'<div class="del-card '+(canAccept?'open-job':canUpdate?'my-job':'')+'\'>'+'<div class="del-ref">'+d.referenceNumber+'</div>'+'<div class="del-cust">'+d.customerName+' <a href="tel:'+d.customerContact+'" style="font-size:.7rem;color:#f39c12;margin-left:5px"><i class="fas fa-phone"></i> '+d.customerContact+'</a></div>'+'<div class="del-route"><i class="fas fa-map-marker-alt" style="color:#f39c12;margin-right:3px"></i>'+(d.pickupLocation||'')+' &rarr; '+(d.deliveryLocation||'')+'</div>'+(d.packageDescription?'<div style="font-size:.7rem;color:rgba(255,255,255,.35);margin-bottom:5px">'+d.packageDescription+'</div>':'')+'<div class="del-amt">MVR '+(d.driverAmount||0)+'</div>'+'<div style="margin-bottom:6px">'+sBadge(d.status)+'</div>'+'<div class="del-btns">'+(canAccept?'<button class="btn-accept" onclick="acceptJob('+d.id+')"><i class="fas fa-check"></i> Accept</button>':'')+(canUpdate?'<button class="btn-upd" onclick="openStat('+d.id+')"><i class="fas fa-pen"></i> Update Status</button>':'')+(canAccept?'<button class="btn-pass" onclick="passJob('+d.id+')"><i class="fas fa-times"></i> Pass</button>':'')+'</div></div>';
 }
 
 window.acceptJob=async function(id){
@@ -617,7 +614,7 @@ window.openStat=function(id){
   $('statDelInfo').innerHTML='<strong style="color:white">'+d.referenceNumber+'</strong> &bull; '+d.customerName+'<br><span style="font-size:.72rem">'+(d.pickupLocation||'')+' &rarr; '+(d.deliveryLocation||'')+'</span>';
   $('statSel').value='Processing';$('proofBox').style.display='none';
   $('proofFile').value='';$('proofFN').textContent='Tap to take photo';$('proofLbl').className='upload-lbl';
-  $('payRcptFile').value='';$('payRcptFN').textContent='Tap to upload receipt';$('payRcptLbl').className='upload-lbl';
+
   $('statMod').classList.add('show');
 };
 $('statClose').onclick=$('statCancel').onclick=function(){$('statMod').classList.remove('show')};
@@ -630,14 +627,14 @@ $('statConfirm').onclick=async function(){
     $('statConfirm').innerHTML='<i class="fas fa-spinner fa-spin"></i>';$('statConfirm').disabled=true;
     var rd=new FileReader();
     rd.onload=async function(ev){
-      d.status='Delivered';d.progress=5;d.deliveryImage=ev.target.result;d.completedAt=new Date().toISOString();d.attendedBy=me.name;
-      var rf=$('payRcptFile').files[0];
-      if(rf){var rd2=new FileReader();rd2.onload=async function(ev2){d.driverPaymentReceipt=ev2.target.result;await finishDelivery(d);};rd2.readAsDataURL(rf);}
-      else{await finishDelivery(d);}
+      d.status='Delivered';d.progress=5;d.deliveryImage=ev.target.result;
+      d.completedAt=new Date().toISOString();d.attendedBy=me.name;
+      await finishDelivery(d);
     };rd.readAsDataURL(pf);
   } else {
     d.status=ns;d.progress=sm[ns]||1;d.attendedBy=me.name;
     await db.ref('cargoDeliveries').set(allD);
+    pushAdminNotif('Status Update: '+d.referenceNumber,'Driver '+me.name+' updated status to "'+ns+'" for '+d.customerName+' ('+d.pickupLocation+'->'+d.deliveryLocation+')');
     $('statMod').classList.remove('show');showToast('Status updated','ok');
   }
 };
@@ -647,6 +644,7 @@ async function finishDelivery(d){
   var drv=drivers.find(function(x){return x.id===me.id;});
   if(drv){drv.totalEarned=(drv.totalEarned||0)+(d.driverAmount||0);await db.ref('drivers').set(drivers);}
   await db.ref('cargoDeliveries').set(allD);
+  pushAdminNotif('Delivery Completed: '+d.referenceNumber,'Driver '+me.name+' delivered to '+d.customerName+'. Route: '+d.pickupLocation+'->'+d.deliveryLocation+'. Amount: MVR '+(d.driverAmount||0));
   $('statMod').classList.remove('show');$('statConfirm').innerHTML='<i class="fas fa-check"></i> Update';$('statConfirm').disabled=false;
   showToast('Marked as Delivered!','ok');
 }
@@ -664,6 +662,10 @@ $('bankConfirm').onclick=async function(){
   loadProfile();loadEarnings();
 };
 
+function pushAdminNotif(title,msg){
+  var n={id:Date.now(),title:title,message:msg,userEmail:'all',type:'driver',timestamp:new Date().toISOString(),read:false};
+  db.ref('notifications').push(n);
+}
 function loadNotifs(){
   var mine=allNotifs.filter(function(n){return n.driverId===me.id;}).sort(function(a,b){return new Date(b.timestamp)-new Date(a.timestamp);});
   var unread=mine.filter(function(n){return!n.read;}).length;
@@ -681,6 +683,13 @@ $('nBtn').onclick=function(){
   loadNotifs();
 };
 $('nClose').onclick=function(){$('nPanel').classList.remove('open')};
+$('nClearAll').onclick=function(){
+  var mine=allNotifs.filter(function(n){return n.driverId===me.id;});
+  allNotifs=allNotifs.filter(function(n){return n.driverId!==me.id;});
+  db.ref('driverNotifications').set(allNotifs);
+  loadNotifs();
+  $('nPanel').classList.remove('open');
+};
 function doLogout(){localStorage.removeItem('ecDriver');me=null;location.reload();}
 </script>
 </body>
