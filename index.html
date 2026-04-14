@@ -375,6 +375,15 @@ a{color:#f39c12;text-decoration:none}
 </div>
 </div>
 
+<!-- SLIP VIEW MODAL -->
+<div class="modal-overlay" id="slipViewMod">
+<div class="modal-box" style="text-align:center">
+  <div class="modal-hd"><div class="modal-title"><i class="fas fa-receipt"></i> Payment Slip</div><button class="close-btn" id="slipViewClose"><i class="fas fa-times"></i></button></div>
+  <img id="slipViewImg" class="slip-img" alt="slip" style="max-height:65vh;width:100%;object-fit:contain">
+  <div class="modal-btns"><button class="btn btn-sec" id="slipViewClose2">Close</button></div>
+</div>
+</div>
+
 <!-- BANK EDIT MODAL -->
 <div class="modal-overlay" id="bankMod">
 <div class="modal-box">
@@ -519,7 +528,7 @@ function initFB(){
   db.ref('drivers').on('value',function(snap){
     var drivers=toArr(snap.val());
     var updated=drivers.find(function(d){return d.id===me.id;});
-    if(updated){me=updated;localStorage.setItem('ecDriver',JSON.stringify(me));}
+    if(updated){me=updated;localStorage.setItem('ecDriver',JSON.stringify(me));loadEarnings();loadProfile();}
   });
 }
 
@@ -573,12 +582,45 @@ function loadEarnings(){
   var pending=done.filter(function(d){return!d.driverPaid;}).reduce(function(s,d){return s+(d.driverAmount||0);},0);
   var paid=done.filter(function(d){return d.driverPaid;}).reduce(function(s,d){return s+(d.driverAmount||0);},0);
   $('earnStats').innerHTML='<div class="sc"><div class="si g"><i class="fas fa-coins"></i></div><div><div class="sv">'+total.toFixed(0)+'</div><div class="sl">TOTAL MVR</div></div></div><div class="sc"><div class="si a"><i class="fas fa-sun"></i></div><div><div class="sv">'+todayE.toFixed(0)+'</div><div class="sl">TODAY</div></div></div><div class="sc"><div class="si c"><i class="fas fa-hourglass-half"></i></div><div><div class="sv">'+pending.toFixed(0)+'</div><div class="sl">PENDING</div></div></div><div class="sc"><div class="si r"><i class="fas fa-check-circle"></i></div><div><div class="sv">'+paid.toFixed(0)+'</div><div class="sl">PAID OUT</div></div></div>';
+  // Bank details
   var bk=me.bank||{};
-  $('bankDetails').innerHTML=bk.bankName?'<div class="brow"><span class="bk">Bank</span><span class="bv">'+bk.bankName+'</span></div><div class="brow"><span class="bk">Account Name</span><span class="bv">'+(bk.accountName||'--')+'</span></div><div class="brow"><span class="bk">Account No.</span><span class="bv">'+(bk.accountNumber||'--')+'</span></div>':'<div class="empty-s" style="padding:.8rem"><p>No bank details set</p></div>';
+  $('bankDetails').innerHTML=bk.bankName
+    ?'<div class="brow"><span class="bk">Bank</span><span class="bv">'+bk.bankName+'</span></div>'
+     +'<div class="brow"><span class="bk">Account Name</span><span class="bv">'+(bk.accountName||'--')+'</span></div>'
+     +'<div class="brow"><span class="bk">Account No.</span><span class="bv" style="font-family:monospace">'+(bk.accountNumber||'--')+'</span></div>'
+    :'<div class="empty-s" style="padding:.8rem"><p>No bank details set. Add them in Profile tab.</p></div>';
+  // Payment slips from admin
+  var slips=me.paySlips||[];
+  var slipHtml='';
+  if(slips.length){
+    slipHtml='<div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid #253241">'
+      +'<div style="font-size:.7rem;font-weight:700;color:#27ae60;margin-bottom:.55rem;display:flex;align-items:center;gap:5px"><i class="fas fa-receipt"></i> Payment Slips from Admin</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:8px">'
+      +slips.map(function(p){
+        return '<div style="background:#1a2535;border:1px solid rgba(39,174,96,.25);border-radius:11px;padding:.65rem;min-width:130px;flex:1">'
+          +'<img src="'+p.slip+'" onclick="openSlipView(\''+p.slip+'\')" style="width:100%;height:72px;object-fit:cover;border-radius:8px;cursor:pointer;margin-bottom:.4rem;border:1px solid rgba(39,174,96,.2)">'
+          +'<div style="font-size:.82rem;font-weight:800;color:#27ae60">MVR '+p.amount+'</div>'
+          +(p.note?'<div style="font-size:.68rem;color:rgba(255,255,255,.4);margin-top:1px">'+p.note+'</div>':'')
+          +'<div style="font-size:.6rem;color:rgba(255,255,255,.28);margin-top:2px">'+fmtD(p.date)+'</div>'
+          +'</div>';
+      }).join('')
+      +'</div></div>';
+  }
+  var bankCard=$('bankDetails').parentElement;
+  var existSlipDiv=bankCard?bankCard.querySelector('.admin-pay-slips'):null;
+  if(existSlipDiv)existSlipDiv.remove();
+  if(slipHtml&&bankCard){var div=document.createElement('div');div.className='admin-pay-slips';div.innerHTML=slipHtml;bankCard.appendChild(div);}
+  // Delivery history list
   var el=$('earnList');
   if(!done.length){el.innerHTML='<div class="empty-s"><i class="fas fa-coins"></i><p>No completed deliveries yet</p></div>';return}
   el.innerHTML=done.sort(function(a,b){return new Date(b.completedAt)-new Date(a.completedAt);}).map(function(d){
-    return'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div><div style="font-family:monospace;font-size:.68rem;color:#f39c12">'+d.referenceNumber+'</div><div style="font-size:.72rem;color:rgba(255,255,255,.5)">'+(d.pickupLocation||'')+'-->'+(d.deliveryLocation||'')+'</div><div style="font-size:.62rem;color:rgba(255,255,255,.3)">'+fmtD(d.completedAt)+'</div></div><div style="text-align:right"><div style="font-size:1rem;font-weight:800;color:#27ae60">MVR '+(d.driverAmount||0)+'</div><div style="font-size:.6rem;margin-top:2px">'+(d.driverPaid?'<span style="color:#27ae60">Paid</span>':'<span style="color:#f39c12">Pending</span>')+'</div></div></div>';
+    return'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
+      +'<div><div style="font-family:monospace;font-size:.68rem;color:#f39c12">'+d.referenceNumber+'</div>'
+      +'<div style="font-size:.72rem;color:rgba(255,255,255,.5)">'+(d.pickupLocation||'')+' → '+(d.deliveryLocation||'')+'</div>'
+      +'<div style="font-size:.62rem;color:rgba(255,255,255,.3)">'+fmtD(d.completedAt)+'</div></div>'
+      +'<div style="text-align:right"><div style="font-size:1rem;font-weight:800;color:#27ae60">MVR '+(d.driverAmount||0)+'</div>'
+      +'<div style="font-size:.6rem;margin-top:2px">'+(d.driverPaid?'<span style="color:#27ae60"><i class="fas fa-check-circle"></i> Paid</span>':'<span style="color:#f39c12"><i class="fas fa-hourglass-half"></i> Pending</span>')+'</div></div>'
+      +'</div>';
   }).join('');
 }
 
@@ -590,7 +632,7 @@ function loadProfile(){
 }
 
 function buildCard(d,canUpdate,canAccept){
-  return'<div class="del-card '+(canAccept?'open-job':canUpdate?'my-job':'')+'\'>'+'<div class="del-ref">'+d.referenceNumber+'</div>'+'<div class="del-cust">'+d.customerName+' <a href="tel:'+d.customerContact+'" style="font-size:.7rem;color:#f39c12;margin-left:5px"><i class="fas fa-phone"></i> '+d.customerContact+'</a></div>'+'<div class="del-route"><i class="fas fa-map-marker-alt" style="color:#f39c12;margin-right:3px"></i>'+(d.pickupLocation||'')+' &rarr; '+(d.deliveryLocation||'')+'</div>'+(d.packageDescription?'<div style="font-size:.7rem;color:rgba(255,255,255,.35);margin-bottom:5px">'+d.packageDescription+'</div>':'')+'<div class="del-amt">MVR '+(d.driverAmount||0)+'</div>'+'<div style="margin-bottom:6px">'+sBadge(d.status)+'</div>'+'<div class="del-btns">'+(canAccept?'<button class="btn-accept" onclick="acceptJob('+d.id+')"><i class="fas fa-check"></i> Accept</button>':'')+(canUpdate?'<button class="btn-upd" onclick="openStat('+d.id+')"><i class="fas fa-pen"></i> Update Status</button>':'')+(canAccept?'<button class="btn-pass" onclick="passJob('+d.id+')"><i class="fas fa-times"></i> Pass</button>':'')+'</div></div>';
+  return'<div class="del-card '+(canAccept?'open-job':(canUpdate?'my-job':''))+'">'+'<div class="del-ref">'+d.referenceNumber+'</div>'+'<div class="del-cust">'+d.customerName+' <a href="tel:'+d.customerContact+'" style="font-size:.7rem;color:#f39c12;margin-left:5px"><i class="fas fa-phone"></i> '+d.customerContact+'</a></div>'+'<div class="del-route"><i class="fas fa-map-marker-alt" style="color:#f39c12;margin-right:3px"></i>'+(d.pickupLocation||'')+' &rarr; '+(d.deliveryLocation||'')+'</div>'+(d.packageDescription?'<div style="font-size:.7rem;color:rgba(255,255,255,.35);margin-bottom:5px">'+d.packageDescription+'</div>':'')+'<div class="del-amt">MVR '+(d.driverAmount||0)+'</div>'+'<div style="margin-bottom:6px">'+sBadge(d.status)+'</div>'+'<div class="del-btns">'+(canAccept?'<button class="btn-accept" onclick="acceptJob('+d.id+')"><i class="fas fa-check"></i> Accept</button>':'')+(canUpdate?'<button class="btn-upd" onclick="openStat('+d.id+')"><i class="fas fa-pen"></i> Update Status</button>':'')+(canAccept?'<button class="btn-pass" onclick="passJob('+d.id+')"><i class="fas fa-times"></i> Pass</button>':'')+'</div></div>';
 }
 
 window.acceptJob=async function(id){
@@ -690,6 +732,8 @@ $('nClearAll').onclick=function(){
   loadNotifs();
   $('nPanel').classList.remove('open');
 };
+window.openSlipView=function(src){$('slipViewImg').src=src;$('slipViewMod').classList.add('show')};
+$('slipViewClose').onclick=$('slipViewClose2').onclick=function(){$('slipViewMod').classList.remove('show')};
 function doLogout(){localStorage.removeItem('ecDriver');me=null;location.reload();}
 </script>
 </body>
