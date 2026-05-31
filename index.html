@@ -2,225 +2,294 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-<title>EasyCargo — Driver</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>EasyCargo — Driver App</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<meta name="theme-color" content="#0a0f1e">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
-body{background:#0a0f1e;min-height:100vh;overflow-x:hidden;color:white}
-#homePage{position:fixed;inset:0;z-index:3000;background:#000;display:flex;align-items:center;justify-content:center}
-.slideshow{position:absolute;inset:0;overflow:hidden}
-.slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.5s;filter:brightness(.55)}
-.slide.active{opacity:1}
-.home-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(10,15,30,.85),rgba(0,0,0,.35));z-index:10}
-.home-content{position:absolute;bottom:14%;left:0;right:0;text-align:center;z-index:20;padding:1.5rem;animation:fadeUp 1s ease}
-.home-logo{display:inline-flex;align-items:center;gap:11px;background:rgba(243,156,18,.14);border:1px solid rgba(243,156,18,.38);border-radius:50px;padding:10px 24px;margin-bottom:1.2rem;backdrop-filter:blur(8px)}
-.home-logo i{color:#f39c12;font-size:1.4rem}
-.home-logo span{color:white;font-size:1.25rem;font-weight:800;letter-spacing:1px}
-.home-content h1{font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;color:white;text-shadow:0 4px 24px rgba(0,0,0,.5);margin-bottom:.8rem;line-height:1.15}
-.home-content h1 span{color:#f39c12}
-.home-content p{font-size:.92rem;color:rgba(255,255,255,.78);margin-bottom:1.6rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6}
-.home-btns{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap}
-.btn-home{padding:12px 32px;border-radius:50px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .3s;border:none;background:#f39c12;color:#1e2a3a;box-shadow:0 6px 20px rgba(243,156,18,.38)}
-.btn-home:hover{transform:translateY(-3px);background:#e67e22;color:white}
-.btn-home-ol{background:transparent;border:2px solid rgba(255,255,255,.55);color:white;box-shadow:none}
-.btn-home-ol:hover{background:rgba(255,255,255,.1);border-color:white;transform:translateY(-3px)}
-.slide-dots{position:absolute;bottom:22px;left:0;right:0;text-align:center;z-index:20;display:flex;justify-content:center;gap:7px}
-.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.38);cursor:pointer;transition:all .3s}
-.dot.active{background:#f39c12;width:24px;border-radius:7px}
-.how-panel{position:absolute;bottom:0;left:0;right:0;z-index:22;max-height:0;overflow:hidden;transition:max-height .45s ease;background:rgba(8,12,24,.97);backdrop-filter:blur(28px);border-top:1px solid rgba(243,156,18,.18)}
-.how-panel.open{max-height:80vh;overflow-y:auto}
-.how-inner{padding:1.2rem}
-.how-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem}
-.how-hd h3{color:#f39c12;font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:6px}
-.how-close{background:rgba(255,255,255,.07);border:none;color:white;font-size:1.1rem;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.how-img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:9px}
-.how-img-item{border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.07);background:#1a2535}
-.how-img-item img{width:100%;display:block;object-fit:cover;min-height:120px}
-.how-empty{text-align:center;padding:1.8rem 1rem;color:rgba(255,255,255,.28);font-size:.82rem;grid-column:1/-1}
-@keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+body{background:#0a0f1e;min-height:100vh;color:white;overflow-x:hidden}
+
+/* ── PLANE INTRO ── */
+#planeIntro{position:fixed;inset:0;background:#0a0f1e;z-index:10000;display:flex;align-items:center;justify-content:center;overflow:hidden;pointer-events:none}
+#planeIntroPlane{position:absolute;font-size:2.6rem;color:white;filter:drop-shadow(0 0 20px rgba(255,255,255,.6));will-change:transform,opacity;animation:planeIntroAnim 2.3s cubic-bezier(.4,0,.2,1) forwards;left:50%;top:-80px;transform:translate(-50%,0) rotate(90deg) scale(.7)}
+@keyframes planeIntroAnim{
+  0%{left:50%;top:-80px;transform:translate(-50%,0) rotate(90deg) scale(.7);opacity:0}
+  6%{opacity:1}
+  35%{left:50%;top:50%;transform:translate(-50%,-50%) rotate(90deg) scale(1.08);opacity:1}
+  42%{left:50%;top:50%;transform:translate(-50%,-50%) rotate(90deg) scale(1);opacity:1}
+  55%{left:50%;top:50%;transform:translate(-50%,-50%) rotate(0deg) scale(1);opacity:1}
+  68%{left:55%;top:50%;transform:translate(-50%,-50%) rotate(-5deg) scaleX(1.1);opacity:1}
+  82%{left:85%;top:50%;transform:translate(-50%,-50%) rotate(-8deg) scaleX(1.2);opacity:.9}
+  93%{left:110%;top:50%;transform:translate(-50%,-50%) rotate(-10deg) scaleX(1.15);opacity:.2}
+  100%{left:130%;top:50%;transform:translate(-50%,-50%) rotate(-10deg);opacity:0}
+}
+#planeIntroTrail{position:absolute;top:50%;left:50%;height:2px;width:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),rgba(255,255,255,.1));transform:translateY(-50%);border-radius:2px;animation:planeTrailAnim 2.3s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes planeTrailAnim{0%,50%{width:0;left:50%;opacity:0}55%{opacity:1}70%{width:80px;left:45%;opacity:.8}85%{width:160px;left:30%;opacity:.5}100%{width:220px;left:10%;opacity:0}}
+
+/* ── AUTH SCREEN ── */
 #authScreen{min-height:100vh;display:none;align-items:center;justify-content:center;background:#0a0f1e;padding:1rem;position:relative}
 #authScreen.show{display:flex}
-#authScreen::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(243,156,18,.06),transparent 60%);pointer-events:none}
-.auth-wrap{width:100%;max-width:460px;position:relative;z-index:1}
+#authScreen::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(243,156,18,.07),transparent 60%);pointer-events:none}
+.auth-wrap{width:100%;max-width:440px}
 .login-box{background:#141b2b;border-radius:26px;border:1px solid #2a3a55;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,.6)}
 .login-strip{background:linear-gradient(135deg,#0e1524,#1a2747);padding:1.5rem;text-align:center;border-bottom:1px solid #253241}
-.login-strip .ico{width:52px;height:52px;background:rgba(243,156,18,.14);border:2px solid rgba(243,156,18,.48);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .6rem;color:#f39c12;font-size:1.45rem}
-.login-strip h2{color:white;font-size:1.3rem;font-weight:800}
+.login-strip .ico{width:58px;height:58px;background:rgba(243,156,18,.14);border:2px solid rgba(243,156,18,.48);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .6rem;color:#f39c12;font-size:1.5rem}
+.login-strip h2{color:white;font-size:1.25rem;font-weight:800}
 .login-strip h2 span{color:#f39c12}
-.login-strip p{color:rgba(255,255,255,.32);font-size:.7rem;margin-top:2px;font-family:monospace}
+.login-strip p{color:rgba(255,255,255,.3);font-size:.68rem;margin-top:3px;font-family:monospace}
 .login-inner{padding:1.35rem}
-.seg-tabs{display:flex;background:#1e2a3a;border-radius:50px;padding:4px;margin-bottom:1.2rem}
-.seg-btn{flex:1;padding:9px;border:none;background:transparent;color:rgba(255,255,255,.48);font-size:.84rem;font-weight:600;border-radius:50px;cursor:pointer;transition:.2s}
+.seg-tabs{display:flex;background:#1e2a3a;border-radius:50px;padding:4px;margin-bottom:1.2rem;gap:4px}
+.seg-btn{flex:1;padding:9px;border:none;background:transparent;color:rgba(255,255,255,.45);font-size:.82rem;font-weight:600;border-radius:50px;cursor:pointer;transition:.2s;font-family:inherit}
 .seg-btn.active{background:#f39c12;color:#1e2a3a}
 .pane{display:none}.pane.active{display:block}
-.fg{margin-bottom:.88rem}
-.fg label{display:block;color:rgba(255,255,255,.6);font-size:.75rem;margin-bottom:.32rem;font-weight:600}
-.fi{width:100%;padding:11px 15px;background:#1e2a3a;border:1px solid #2e3f55;border-radius:25px;color:white;font-size:.86rem;outline:none;transition:.2s;font-family:inherit}
-.fi:focus{border-color:#f39c12;background:#23324a;box-shadow:0 0 0 3px rgba(243,156,18,.09)}
+.fg{margin-bottom:.85rem}
+.fg label{display:block;color:rgba(255,255,255,.55);font-size:.74rem;margin-bottom:.3rem;font-weight:600}
+.fi{width:100%;padding:11px 15px;background:#1e2a3a;border:1px solid #2e3f55;border-radius:25px;color:white;font-size:.85rem;outline:none;transition:.2s;font-family:inherit}
+.fi:focus{border-color:#f39c12;background:#23324a}
 .fi::placeholder{color:rgba(255,255,255,.2)}
+.fi:disabled{opacity:.5;cursor:not-allowed}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-@media(max-width:400px){.fr{grid-template-columns:1fr}}
-.btn{padding:12px 18px;border:none;border-radius:35px;font-weight:700;cursor:pointer;font-size:.86rem;transition:.2s;width:100%;display:flex;align-items:center;justify-content:center;gap:7px}
+@media(max-width:380px){.fr{grid-template-columns:1fr}}
+.btn{padding:12px 18px;border:none;border-radius:35px;font-weight:700;cursor:pointer;font-size:.86rem;transition:.2s;width:100%;display:flex;align-items:center;justify-content:center;gap:7px;font-family:inherit}
 .btn-gold{background:#f39c12;color:#1e2a3a;box-shadow:0 5px 17px rgba(243,156,18,.28)}
 .btn-gold:hover{background:#e67e22;transform:translateY(-2px);color:white}
-.btn-sec{background:#2e3f55;color:white}
-.btn-sec:hover{background:#3a4f6a}
-.msg{padding:9px 14px;border-radius:14px;margin-bottom:.82rem;font-size:.78rem;text-align:center;display:none}
+.btn-sec{background:#2e3f55;color:white}.btn-sec:hover{background:#3a4f6a}
+.msg{padding:9px 14px;border-radius:14px;margin-bottom:.75rem;font-size:.78rem;text-align:center;display:none}
 .msg.ok{background:rgba(39,174,96,.13);border:1px solid #27ae60;color:#2ecc71;display:block}
 .msg.err{background:rgba(231,76,60,.13);border:1px solid #e74c3c;color:#e74c3c;display:block}
-.upload-lbl{display:flex;align-items:center;gap:8px;background:#1e2a3a;border:1.5px dashed rgba(243,156,18,.35);border-radius:14px;padding:10px 14px;cursor:pointer;transition:.2s;margin-top:4px;font-size:.78rem;color:rgba(255,255,255,.55)}
-.upload-lbl:hover{border-color:#f39c12;background:#23324a;color:white}
-.upload-lbl i{color:#f39c12;font-size:1.1rem;flex-shrink:0}
-.upload-lbl .fn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.upload-lbl.done{border-color:rgba(39,174,96,.45);background:rgba(39,174,96,.06);color:#27ae60}
-.upload-lbl input{display:none}
+.msg.info{background:rgba(243,156,18,.1);border:1px solid rgba(243,156,18,.3);color:#f39c12;display:block}
+
+/* Upload zone */
+.upload-zone{border:2px dashed rgba(243,156,18,.25);border-radius:14px;padding:.9rem;text-align:center;cursor:pointer;background:#1b2537;position:relative;transition:.2s;margin:.3rem 0}
+.upload-zone:hover{border-color:rgba(243,156,18,.5);background:#223040}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone i{font-size:1.2rem;color:#f39c12;display:block;margin-bottom:4px}
+.upload-zone span{font-size:.72rem;color:rgba(255,255,255,.4)}
+.upload-zone.has-file{border-color:rgba(39,174,96,.4);background:rgba(39,174,96,.05)}
+.upload-zone.has-file span{color:#27ae60}
+
+/* Pending box */
 .pending-box{background:rgba(243,156,18,.07);border:1px solid rgba(243,156,18,.26);border-radius:15px;padding:1.2rem;text-align:center;margin:.8rem 0}
-.pending-box i{font-size:2rem;color:#f39c12;display:block;margin-bottom:.5rem}
-.pending-box h3{color:white;font-size:.95rem;font-weight:700;margin-bottom:.3rem}
-.pending-box p{color:rgba(255,255,255,.48);font-size:.74rem;line-height:1.6}
-#driverApp{display:none;width:100%;min-height:100vh;background:#0a0f1e}
+.pending-box i{font-size:2rem;color:#f39c12;display:block;margin-bottom:.6rem}
+.pending-box h3{color:white;font-size:.92rem;font-weight:700;margin-bottom:.4rem}
+.pending-box p{color:rgba(255,255,255,.45);font-size:.74rem;line-height:1.6}
+
+/* ── DASHBOARD ── */
+#driverApp{display:none;min-height:100vh;background:#0a0f1e;max-width:100vw;overflow-x:hidden}
 .top-bar{background:#141b2b;padding:0 .9rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid #253241;position:sticky;top:0;z-index:200;height:54px}
 .tb-brand{flex:1;display:flex;align-items:center;gap:7px;font-size:1rem;font-weight:800;color:white}
 .tb-brand span{color:#f39c12}
-.status-chip{font-size:.65rem;padding:3px 10px;border-radius:12px;font-weight:700}
-.sc-active{background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#27ae60}
-.sc-pending{background:rgba(243,156,18,.15);border:1px solid rgba(243,156,18,.3);color:#f39c12}
-.btn-ico{background:#1e2a3a;border:1px solid #2e3f55;color:rgba(255,255,255,.55);width:33px;height:33px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.82rem;flex-shrink:0}
-.btn-ico:hover{border-color:#f39c12;color:#f39c12}
-.n-bell{position:relative}
-.n-bell-btn{background:rgba(243,156,18,.09);border:1px solid rgba(243,156,18,.2);border-radius:50%;width:33px;height:33px;display:flex;align-items:center;justify-content:center;color:#f39c12;font-size:.82rem;cursor:pointer}
-.n-dot{position:absolute;top:-3px;right:-3px;background:#e74c3c;color:white;border-radius:50px;min-width:16px;height:16px;padding:0 3px;font-size:.55rem;font-weight:700;display:none;align-items:center;justify-content:center;border:2px solid #141b2b}
-.n-dot.show{display:flex}
-.nav-bar{background:#141b2b;border-bottom:1px solid #253241;overflow-x:auto;scrollbar-width:none}
-.nav-bar::-webkit-scrollbar{display:none}
-.nav-tabs{display:flex;min-width:max-content}
-.ntab{padding:11px 15px;border:none;background:transparent;color:rgba(255,255,255,.47);font-size:.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.2s;display:flex;align-items:center;gap:5px}
-.ntab.active{color:#f39c12;border-bottom-color:#f39c12}
-.content{padding:.9rem;padding-bottom:5.5rem}
+.user-chip{display:flex;align-items:center;gap:6px;background:#1e2a3a;border:1px solid #2e3f55;border-radius:50px;padding:4px 11px 4px 4px;cursor:pointer}
+.user-av{width:28px;height:28px;background:rgba(243,156,18,.2);border:1.5px solid rgba(243,156,18,.38);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#f39c12;font-size:.75rem}
+.user-nm{font-size:.76rem;font-weight:600;color:white;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-ico{background:#1e2a3a;border:1px solid #2e3f55;color:rgba(255,255,255,.55);width:33px;height:33px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;font-size:.82rem;flex-shrink:0;border:none}
+.btn-ico:hover{border:1px solid #f39c12;color:#f39c12}
+
+/* Bottom nav */
+.mob-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#141b2b;border-top:1px solid #253241;padding:7px 0 max(10px,env(safe-area-inset-bottom));z-index:300}
+.m-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:rgba(255,255,255,.35);font-size:.56rem;font-weight:600;cursor:pointer;padding:2px;border:none;background:none;font-family:inherit}
+.m-tab i{font-size:1rem}
+.m-tab.active{color:#f39c12}
+
+.content{padding:.9rem;padding-bottom:6rem;max-width:100vw}
 .sec{display:none}.sec.active{display:block}
-.sec-title{color:white;font-size:1.05rem;font-weight:700;margin-bottom:.82rem;display:flex;align-items:center;gap:.45rem}
+.sec-title{color:white;font-size:1rem;font-weight:700;margin-bottom:.85rem;display:flex;align-items:center;gap:.45rem}
 .sec-title i{color:#f39c12}
-.card{background:#141b2b;border-radius:18px;padding:1rem;margin-bottom:.9rem;border:1px solid #2e3f55}
-.c-hd{display:flex;align-items:center;gap:8px;margin-bottom:.85rem;padding-bottom:.78rem;border-bottom:1px solid #253241}
+
+/* Cards */
+.card{background:#141b2b;border-radius:18px;padding:1rem;margin-bottom:.85rem;border:1px solid #2e3f55}
+.c-hd{display:flex;align-items:center;gap:8px;margin-bottom:.85rem;padding-bottom:.75rem;border-bottom:1px solid #253241}
 .c-ico{width:28px;height:28px;background:rgba(243,156,18,.11);border:1px solid rgba(243,156,18,.22);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:#f39c12;flex-shrink:0}
 .c-hd h3{font-size:.84rem;font-weight:700;color:white}
-.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.85rem}
-@media(min-width:500px){.sg{grid-template-columns:repeat(4,1fr)}}
-.sc{background:#141b2b;border-radius:16px;padding:.82rem;border:1px solid #2e4057;display:flex;align-items:center;gap:.6rem}
-.si{width:37px;height:37px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
-.si.g{background:rgba(39,174,96,.13);color:#27ae60}
-.si.a{background:rgba(243,156,18,.13);color:#f39c12}
-.si.c{background:rgba(52,152,219,.13);color:#3498db}
-.si.r{background:rgba(231,76,60,.1);color:#e74c3c}
-.sv{font-size:1.25rem;font-weight:800;color:white;line-height:1}
-.sl{font-size:.58rem;color:rgba(255,255,255,.36);margin-top:3px;text-transform:uppercase;letter-spacing:.5px;font-family:monospace}
-.del-card{background:#1b2537;border:1px solid #2e3f55;border-radius:14px;padding:.9rem;margin-bottom:.75rem}
-.del-card.open-job{border-color:rgba(39,174,96,.3);background:rgba(39,174,96,.03)}
-.del-card.my-job{border-color:rgba(243,156,18,.3);background:rgba(243,156,18,.03)}
-.del-ref{font-family:monospace;font-size:.68rem;font-weight:700;color:#f39c12;margin-bottom:3px}
-.del-cust{font-size:.82rem;font-weight:700;color:white;margin-bottom:2px}
-.del-route{font-size:.71rem;color:rgba(255,255,255,.45);margin-bottom:5px}
-.del-amt{font-size:1.15rem;font-weight:800;color:#27ae60;margin-bottom:8px}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:.9rem}
+.stat-card{background:#141b2b;border-radius:16px;padding:.85rem;border:1px solid #2e3f55;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--sc,#f39c12)}
+.stat-val{font-size:1.6rem;font-weight:900;font-family:monospace;color:var(--sc,#f39c12);line-height:1;margin-bottom:3px}
+.stat-lbl{font-size:.6rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.8px;font-family:monospace}
+
+/* Order cards */
+.order-card{background:#1a2535;border:1.5px solid #2e3f55;border-radius:16px;padding:.9rem;margin-bottom:.7rem;transition:.2s;position:relative;overflow:hidden}
+.order-card:hover{border-color:rgba(243,156,18,.35)}
+.order-card.available{border-color:rgba(39,174,96,.3);background:linear-gradient(135deg,#0d1f15,#111f18)}
+.order-card.available::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#27ae60,#2ecc71)}
+.order-card.mine{border-color:rgba(243,156,18,.3);background:linear-gradient(135deg,#1a1500,#1f1a00)}
+.order-card.mine::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f39c12,#e67e22)}
+.order-card.completed{border-color:rgba(52,152,219,.2);opacity:.75}
+.oc-ref{font-family:monospace;font-size:.7rem;color:#f39c12;font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:6px}
+.oc-route{font-size:.82rem;font-weight:700;color:white;margin-bottom:.35rem;display:flex;align-items:center;gap:6px}
+.oc-route i{color:#f39c12;font-size:.75rem}
+.oc-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.55rem}
+.oc-chip{font-size:.65rem;padding:3px 9px;border-radius:12px;font-weight:700;font-family:monospace}
+.oc-chip-type{background:rgba(100,180,255,.12);color:#64b4ff;border:1px solid rgba(100,180,255,.2)}
+.oc-chip-price{background:rgba(243,156,18,.12);color:#f39c12;border:1px solid rgba(243,156,18,.2)}
+.oc-chip-date{background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.08)}
+.oc-chip-earn{background:rgba(39,174,96,.12);color:#27ae60;border:1px solid rgba(39,174,96,.2)}
+.oc-driver{font-size:.68rem;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:5px;margin-bottom:.55rem}
+.oc-driver i{color:#9b59b6}
+.btn-take{width:100%;padding:10px;background:linear-gradient(135deg,#27ae60,#2ecc71);color:white;border:none;border-radius:14px;font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.btn-take:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(39,174,96,.3)}
+.btn-complete{width:100%;padding:10px;background:linear-gradient(135deg,#3498db,#2980b9);color:white;border:none;border-radius:14px;font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;transition:.2s}
+.btn-complete:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(52,152,219,.3)}
+.btn-release{background:rgba(231,76,60,.15);color:#e74c3c;border:1px solid rgba(231,76,60,.25);border-radius:14px;padding:7px 14px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s}
+
+/* Earnings */
+.earn-hero{background:linear-gradient(135deg,#0e1a0a,#152210);border:1.5px solid rgba(39,174,96,.25);border-radius:20px;padding:1.2rem;margin-bottom:.85rem;position:relative;overflow:hidden}
+.earn-hero::before{content:'';position:absolute;width:160px;height:160px;border-radius:50%;background:#27ae60;filter:blur(60px);opacity:.12;top:-40px;right:-30px}
+.earn-big{font-size:2.8rem;font-weight:900;color:#27ae60;font-family:monospace;line-height:1;text-shadow:0 0 30px rgba(39,174,96,.3)}
+.earn-lbl{font-size:.65rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;font-family:monospace;margin-bottom:.25rem}
+.earn-sub{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:.4rem}
+
+/* Payment rows */
+.pay-row{display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.pay-row:last-child{border-bottom:none}
+.pay-ref{font-family:monospace;font-size:.68rem;color:#f39c12}
+.pay-date{font-size:.62rem;color:rgba(255,255,255,.3)}
+.pay-amt{font-family:monospace;font-weight:800;color:#27ae60;font-size:.84rem}
+.pay-pending{color:#f39c12}
+
+/* Profile */
+.profile-hero{background:linear-gradient(135deg,#0e1524,#1a2747);border-radius:20px;padding:1.2rem;margin-bottom:.85rem;text-align:center;border:1px solid #2a3a55}
+.profile-av{width:72px;height:72px;background:rgba(243,156,18,.15);border:3px solid rgba(243,156,18,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .7rem;font-size:1.8rem;color:#f39c12}
+.profile-name{font-size:1rem;font-weight:800;color:white;margin-bottom:.2rem}
+.profile-contact{font-size:.75rem;color:rgba(255,255,255,.4);font-family:monospace}
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:50px;font-size:.65rem;font-weight:700;margin-top:.5rem}
+.status-verified{background:rgba(39,174,96,.12);border:1px solid rgba(39,174,96,.3);color:#27ae60}
+.status-pending{background:rgba(243,156,18,.1);border:1px solid rgba(243,156,18,.25);color:#f39c12}
+.status-rejected{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.25);color:#e74c3c}
+.doc-row{display:flex;align-items:center;gap:10px;padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.doc-row:last-child{border-bottom:none}
+.doc-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.doc-lbl{font-size:.76rem;font-weight:600;color:white;margin-bottom:1px}
+.doc-sub{font-size:.62rem;color:rgba(255,255,255,.35)}
+.doc-status{margin-left:auto;font-size:.6rem;font-weight:700;padding:3px 9px;border-radius:10px}
+
+/* Badge */
 .badge{display:inline-block;padding:2px 8px;border-radius:14px;font-size:.6rem;font-weight:700;font-family:monospace}
-.b-placed{background:rgba(243,156,18,.13);color:#f39c12;border:1px solid rgba(243,156,18,.18)}
-.b-proc{background:rgba(52,152,219,.13);color:#3498db;border:1px solid rgba(52,152,219,.18)}
-.b-trans{background:rgba(142,68,173,.13);color:#9b59b6;border:1px solid rgba(142,68,173,.18)}
-.b-out{background:rgba(230,126,34,.13);color:#e67e22;border:1px solid rgba(230,126,34,.18)}
-.b-del{background:rgba(39,174,96,.13);color:#27ae60;border:1px solid rgba(39,174,96,.18)}
-.del-btns{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
-.btn-accept{padding:9px 18px;background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);color:#27ae60;border-radius:20px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit}
-.btn-accept:hover{background:rgba(39,174,96,.28)}
-.btn-pass{padding:9px 14px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.18);color:#e74c3c;border-radius:20px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit}
-.btn-upd{padding:9px 14px;background:rgba(52,152,219,.1);border:1px solid rgba(52,152,219,.22);color:#3498db;border-radius:20px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit}
-.i-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
-.i-cell{background:#1e2a3a;border:1px solid #2e3f55;border-radius:9px;padding:8px 10px}
-.i-cell .il{font-size:.55rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;font-family:monospace}
-.i-cell .iv{font-size:.76rem;font-weight:600;color:white;word-break:break-all}
-.n-panel{position:fixed;top:0;right:-320px;width:305px;height:100vh;background:#141b2b;z-index:1500;border-left:1px solid #2a3a55;transition:right .3s;overflow-y:auto;display:flex;flex-direction:column}
-.n-panel.open{right:0}
-@media(max-width:340px){.n-panel{width:100%;right:-100%}}
-.n-hd{padding:.85rem;border-bottom:1px solid #253241;display:flex;justify-content:space-between;align-items:center;background:#0f1624;position:sticky;top:0;z-index:2}
-.n-hd-t{color:white;font-weight:700;font-size:.85rem;display:flex;align-items:center;gap:6px}
-.n-hd-t i{color:#f39c12}
-.n-close{background:none;border:none;color:rgba(255,255,255,.38);font-size:1.2rem;cursor:pointer}
-.n-list{flex:1;padding:.65rem}
-.n-item{background:#1b2537;border-radius:11px;padding:.75rem;margin-bottom:.45rem;border-left:3px solid #2e3f55;cursor:pointer}
-.n-item.unread{border-left-color:#f39c12;background:#1e2d42}
-.n-item .nt{font-size:.76rem;font-weight:700;color:white;margin-bottom:2px}
-.n-item .nm{font-size:.7rem;color:rgba(255,255,255,.52);line-height:1.4}
-.n-item .nd{font-size:.6rem;color:rgba(255,255,255,.28);margin-top:4px;font-family:monospace}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.84);align-items:flex-end;justify-content:center;z-index:2000;padding:0}
-.modal-overlay.show{display:flex}
-@media(min-width:540px){.modal-overlay{align-items:center;padding:1rem}}
-.modal-box{background:#141b2b;border-radius:22px 22px 0 0;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;border:1px solid #2e3f55;border-bottom:none;padding:1.1rem;animation:slideUp .3s ease}
-@media(min-width:540px){.modal-box{border-radius:22px;border-bottom:1px solid #2e3f55;animation:fadeIn .25s ease}}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-@keyframes fadeIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
-.modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem;padding-bottom:.8rem;border-bottom:1px solid #253241}
-.modal-title{color:white;font-size:.94rem;font-weight:700;display:flex;align-items:center;gap:6px}
-.modal-title i{color:#f39c12}
-.close-btn{background:rgba(255,255,255,.07);border:none;color:white;font-size:1.2rem;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.modal-btns{display:flex;gap:8px;margin-top:.9rem}
-.brow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.78rem}
-.brow:last-child{border-bottom:none}
-.brow .bk{color:rgba(255,255,255,.42)}
-.brow .bv{color:white;font-weight:700}
-.slip-img{max-width:100%;border-radius:10px;margin:8px 0;border:1px solid #2e3f55}
-.toast{position:fixed;top:62px;left:50%;transform:translateX(-50%) translateY(-16px);z-index:3000;max-width:310px;width:92%;background:#1e2a3a;border-radius:15px;padding:.78rem .9rem;border:1px solid #2e4057;box-shadow:0 12px 40px rgba(0,0,0,.6);display:flex;align-items:center;gap:7px;opacity:0;transition:all .3s;pointer-events:none}
+.b-green{background:rgba(39,174,96,.13);color:#27ae60;border:1px solid rgba(39,174,96,.2)}
+.b-orange{background:rgba(243,156,18,.13);color:#f39c12;border:1px solid rgba(243,156,18,.2)}
+.b-red{background:rgba(231,76,60,.13);color:#e74c3c;border:1px solid rgba(231,76,60,.2)}
+.b-blue{background:rgba(52,152,219,.13);color:#3498db;border:1px solid rgba(52,152,219,.2)}
+
+/* Toast */
+.toast{position:fixed;top:62px;left:50%;transform:translateX(-50%) translateY(-16px);z-index:5000;max-width:310px;width:92%;background:#1e2a3a;border-radius:15px;padding:.78rem .9rem;border:1px solid #2e4057;display:flex;align-items:center;gap:7px;opacity:0;transition:all .3s;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:rgba(39,174,96,.32);background:linear-gradient(135deg,#0d2218,#142b1e)}
 .toast.err{border-color:rgba(231,76,60,.32);background:linear-gradient(135deg,#230d0d,#2b1212)}
 .toast.info{border-color:rgba(243,156,18,.26)}
-.t-ico{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0}
+.t-ico{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;flex-shrink:0}
 .toast.ok .t-ico{background:rgba(39,174,96,.18);color:#27ae60}
 .toast.err .t-ico{background:rgba(231,76,60,.18);color:#e74c3c}
 .toast.info .t-ico{background:rgba(243,156,18,.1);color:#f39c12}
 .t-msg{flex:1;font-size:.76rem;color:white;font-weight:500}
-.mob-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#141b2b;border-top:1px solid #253241;padding:7px 0 10px;z-index:300}
-@media(min-width:768px){.mob-nav{display:none}}
-.m-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:rgba(255,255,255,.35);font-size:.56rem;font-weight:600;cursor:pointer;padding:2px;border:none;background:none;font-family:inherit}
-.m-tab i{font-size:1rem}
-.m-tab.active{color:#f39c12}
-.empty-s{text-align:center;padding:1.8rem 1rem;color:rgba(255,255,255,.28)}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.84);align-items:flex-end;justify-content:center;z-index:2000;padding:0}
+.modal-overlay.show{display:flex}
+@media(min-width:540px){.modal-overlay{align-items:center;padding:1rem}}
+.modal-box{background:#141b2b;border-radius:22px 22px 0 0;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;border:1px solid #2e3f55;border-bottom:none;padding:1.1rem;animation:slideUp .3s ease}
+@media(min-width:540px){.modal-box{border-radius:22px;border-bottom:1px solid #2e3f55;animation:fadeIn .25s ease}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem;padding-bottom:.75rem;border-bottom:1px solid #253241}
+.modal-title{color:white;font-size:.92rem;font-weight:700;display:flex;align-items:center;gap:7px}
+.close-btn{background:rgba(255,255,255,.07);border:none;color:white;font-size:1.1rem;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* Empty */
+.empty-s{text-align:center;padding:2rem 1rem;color:rgba(255,255,255,.25)}
 .empty-s i{font-size:2rem;display:block;margin-bottom:.45rem;opacity:.2}
 .empty-s p{font-size:.78rem}
-p,span,div,h1,h2,h3,h4,label{color:inherit}
-a{color:#f39c12;text-decoration:none}
+
+/* Pending pulse */
+@keyframes pendingPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+/* New order pulse */
+@keyframes newPulse{0%,100%{box-shadow:0 0 0 0 rgba(39,174,96,.4)}50%{box-shadow:0 0 0 8px rgba(39,174,96,0)}}
+.order-card.new-order{animation:newPulse 2s infinite}
+
+/* ── Vehicle animations ── */
+.cargo-icon-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;position:relative;overflow:hidden}
+/* Air cargo — static gold box, plane flies across FULL CARD */
+.cargo-air .cargo-icon-wrap{background:linear-gradient(135deg,#f39c12,#e67e22);box-shadow:0 4px 16px rgba(243,156,18,.4);border:none}
+.cargo-air .cargo-icon-wrap i{color:white}
+/* Full card flying plane */
+.cargo-air::after{content:"\f072";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;top:50%;font-size:1.6rem;color:rgba(243,156,18,.9);pointer-events:none;animation:planeFullFly 2s cubic-bezier(.25,0,.5,1) infinite;filter:drop-shadow(0 0 8px rgba(243,156,18,.6));z-index:10}
+@keyframes planeFullFly{
+  0%  {left:-40px;transform:translateY(-50%) rotate(-8deg) scale(.7);opacity:0}
+  8%  {opacity:1}
+  50% {left:50%;transform:translateY(-50%) rotate(-10deg) scale(1.05);opacity:1}
+  85% {left:105%;transform:translateY(-50%) rotate(-12deg) scale(1.1);opacity:.6}
+  95% {left:115%;opacity:0}
+  96% {left:-40px;opacity:0}
+  100%{left:-40px;opacity:0}
+}
+/* Normal cargo — FULL GREEN bg, motorbike rolls across full card */
+.cargo-normal .cargo-icon-wrap{background:linear-gradient(135deg,#27ae60,#1e8449);box-shadow:0 4px 16px rgba(39,174,96,.35);border:none}
+.cargo-normal .cargo-icon-wrap i{color:white}
+.cargo-normal::after{content:"\f21c";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;top:50%;font-size:1.4rem;color:rgba(39,174,96,.85);pointer-events:none;animation:bikeFullRoll 2.2s linear infinite;filter:drop-shadow(0 0 6px rgba(39,174,96,.5));z-index:10}
+@keyframes bikeFullRoll{
+  0%  {left:-40px;transform:translateY(-50%) scaleX(1);opacity:0}
+  6%  {opacity:1}
+  50% {left:50%;transform:translateY(-52%) scaleX(1.05);opacity:1}
+  85% {left:105%;transform:translateY(-50%) scaleX(1.08);opacity:.5}
+  95% {left:115%;opacity:0}
+  96% {left:-40px;opacity:0}
+  100%{left:-40px;opacity:0}
+}
+/* Express cargo — FULL RED bg, motorbike FAST across full card */
+.cargo-express .cargo-icon-wrap{background:linear-gradient(135deg,#e74c3c,#c0392b);box-shadow:0 4px 16px rgba(231,76,60,.35);border:none}
+.cargo-express .cargo-icon-wrap i{color:white}
+.cargo-express::after{content:"\f21c";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;top:50%;font-size:1.4rem;color:rgba(231,76,60,.9);pointer-events:none;animation:bikeFullSprint 1.2s linear infinite;filter:drop-shadow(0 0 8px rgba(231,76,60,.6));z-index:10}
+@keyframes bikeFullSprint{
+  0%  {left:-40px;transform:translateY(-50%) scaleX(1.1);opacity:0}
+  5%  {opacity:1}
+  50% {left:50%;transform:translateY(-53%) scaleX(1.15);opacity:1}
+  80% {left:105%;transform:translateY(-50%) scaleX(1.2);opacity:.4}
+  90% {left:115%;opacity:0}
+  91% {left:-40px;opacity:0}
+  100%{left:-40px;opacity:0}
+}
+/* Take order animation */
+.taking-order{animation:takeAnim .6s ease forwards;pointer-events:none}
+@keyframes takeAnim{0%{opacity:1;transform:scale(1)}40%{transform:scale(1.03)}100%{opacity:0;transform:scale(.9) translateY(-10px);height:0;padding:0;margin:0;overflow:hidden}}
+/* Countdown Timer */
+.deadline-timer{display:flex;align-items:center;gap:8px;border-radius:10px;padding:6px 10px;margin-bottom:.5rem}
+.deadline-timer.ok{background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.2)}
+.deadline-timer.warn{background:rgba(243,156,18,.08);border:1px solid rgba(243,156,18,.25);animation:timerPulse 2s infinite}
+.deadline-timer.urgent{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);animation:timerPulse .8s infinite}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.7}}
+.timer-digits{font-family:monospace;font-weight:800;font-size:.82rem;letter-spacing:1px}
+.deadline-timer.ok .timer-digits{color:#27ae60}
+.deadline-timer.warn .timer-digits{color:#f39c12}
+.deadline-timer.urgent .timer-digits{color:#e74c3c}
+/* Notification dot */
+.n-dot{background:#e74c3c;color:white;border-radius:50%;min-width:16px;height:16px;padding:0 3px;font-size:.52rem;font-weight:700;display:none;align-items:center;justify-content:center;position:absolute;top:-3px;right:-3px;border:2px solid #141b2b}
+.n-dot.show{display:flex}
+.rel-wrap{position:relative}
+
+input[type="date"].fi{-webkit-appearance:none;min-height:44px}
+input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1) opacity(.5);cursor:pointer}
+html,body{max-width:100vw;-webkit-tap-highlight-color:transparent}
 </style>
 </head>
 <body>
 
-<!-- HOME PAGE -->
-<div id="homePage">
-  <div class="slideshow" id="slideshow"></div>
-  <div class="home-overlay"></div>
-  <div class="home-content">
-    <div class="home-logo"><i class="fas fa-motorcycle"></i><span>EasyCargo</span></div>
-    <h1>Join Our<br><span>Driver Network</span></h1>
-    <p id="homeTagline">Deliver with EasyCargo and earn on every delivery across the Maldives.</p>
-    <div class="home-btns">
-      <button class="btn-home" onclick="showAuth()"><i class="fas fa-sign-in-alt"></i> Driver Sign In</button>
-      <button class="btn-home btn-home-ol" onclick="toggleHow()"><i class="fas fa-question-circle"></i> How It Works</button>
-    </div>
-  </div>
-  <div class="slide-dots" id="slideDots"></div>
-  <div class="how-panel" id="howPanel">
-    <div class="how-inner">
-      <div class="how-hd"><h3><i class="fas fa-images"></i> Driver Guide</h3><button class="how-close" onclick="toggleHow()"><i class="fas fa-times"></i></button></div>
-      <div class="how-img-grid" id="howImgGrid"><div class="how-empty">No guide images yet.</div></div>
-    </div>
-  </div>
+<!-- PLANE INTRO -->
+<div id="planeIntro">
+  <div id="planeIntroPlane"><i class="fas fa-plane"></i></div>
+  <div id="planeIntroTrail"></div>
 </div>
 
-<!-- AUTH -->
+<!-- AUTH SCREEN -->
 <div id="authScreen">
 <div class="auth-wrap">
   <div class="login-box">
     <div class="login-strip">
-      <div class="ico"><i class="fas fa-motorcycle"></i></div>
+      <div class="ico"><i class="fas fa-truck-fast"></i></div>
       <h2>Easy<span>Cargo</span></h2>
       <p>// driver portal</p>
     </div>
@@ -229,542 +298,1229 @@ a{color:#f39c12;text-decoration:none}
         <button class="seg-btn active" id="tLogin">Sign In</button>
         <button class="seg-btn" id="tReg">Register</button>
       </div>
+
+      <!-- LOGIN -->
       <div class="pane active" id="pLogin">
         <div id="loginMsg"></div>
-        <div class="fg"><label>Phone / Username</label><input class="fi" type="text" id="lUsr" placeholder="Your contact number..."></div>
-        <div class="fg"><label>Password</label><input class="fi" type="password" id="lPwd" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+        <div class="fg"><label><i class="fas fa-phone" style="color:#f39c12;margin-right:5px"></i>Contact Number</label><input class="fi" type="tel" id="lContact" placeholder="7XXXXXXX" inputmode="numeric"></div>
+        <div class="fg"><label><i class="fas fa-lock" style="color:#f39c12;margin-right:5px"></i>Password</label><input class="fi" type="password" id="lPwd" placeholder="••••••••"></div>
         <button class="btn btn-gold" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Sign In</button>
-        <p style="text-align:center;margin-top:.8rem;font-size:.74rem;color:rgba(255,255,255,.38)">No account? <a href="#" onclick="document.getElementById('tReg').click()">Register as Driver</a></p>
       </div>
+
+      <!-- REGISTER -->
       <div class="pane" id="pReg">
         <div id="regMsg"></div>
         <div class="fr">
-          <div class="fg"><label>Full Name</label><input class="fi" type="text" id="rName" placeholder="Ahmed Ali"></div>
-          <div class="fg"><label>Contact Number</label><input class="fi" type="tel" id="rCnt" placeholder="7XXXXXXX"></div>
+          <div class="fg"><label>Full Name</label><input class="fi" type="text" id="rName" placeholder="Full name"></div>
+          <div class="fg"><label>Contact Number</label><input class="fi" type="tel" id="rContact" placeholder="7XXXXXXX" inputmode="numeric"></div>
         </div>
-        <div class="fg"><label>Vehicle Type</label><input class="fi" type="text" id="rVeh" placeholder="e.g. Motorcycle, Pickup"></div>
         <div class="fr">
           <div class="fg"><label>Password</label><input class="fi" type="password" id="rPwd" placeholder="Password"></div>
-          <div class="fg"><label>Confirm</label><input class="fi" type="password" id="rCfm" placeholder="Repeat"></div>
+          <div class="fg"><label>Confirm Password</label><input class="fi" type="password" id="rCfm" placeholder="Repeat"></div>
+        </div>
+        <div class="fg"><label>Email (optional)</label><input class="fi" type="email" id="rEmail" placeholder="email@example.com"></div>
+        <div class="fg">
+          <label><i class="fas fa-truck" style="color:#f39c12;margin-right:5px"></i>Vehicle Type</label>
+          <div id="vehicleGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:.3rem"></div>
+          <input type="hidden" id="rVehicle">
+        </div>
+        <div class="fr">
+          <div class="fg"><label>Vehicle Number Plate</label><input class="fi" type="text" id="rVehicleNum" placeholder="e.g. PL-1234"></div>
+          <div class="fg"><label>Bank Account Number</label><input class="fi" type="text" id="rAccount" placeholder="BML / MIB account number"></div>
+        </div>
+        <div class="fg"><label>Bank Name</label><select class="fi" id="rBank">
+          <option value="">Select bank</option>
+          <option value="BML">Bank of Maldives (BML)</option>
+          <option value="MIB">Maldives Islamic Bank (MIB)</option>
+          <option value="SBI">State Bank of India (SBI)</option>
+          <option value="HDFC">HDFC Bank</option>
+          <option value="Other">Other</option>
+        </select></div>
+        <hr style="border-color:rgba(255,255,255,.08);margin:.5rem 0 .85rem">
+        <div style="font-size:.72rem;color:rgba(255,255,255,.45);margin-bottom:.65rem;font-weight:600"><i class="fas fa-id-card" style="color:#f39c12;margin-right:5px"></i>Identity Documents (Required for Verification)</div>
+        <div class="fg">
+          <label>National ID / Passport Photo</label>
+          <div class="upload-zone" id="idUploadZone">
+            <input type="file" id="idUpload" accept="image/*">
+            <i class="fas fa-id-card"></i>
+            <span id="idUploadLbl">Tap to upload ID / Passport</span>
+          </div>
         </div>
         <div class="fg">
-          <label><i class="fas fa-id-card" style="color:#f39c12;margin-right:4px"></i>National ID / Passport Photo</label>
-          <label class="upload-lbl" id="idLbl">
-            <i class="fas fa-id-card"></i><span class="fn" id="idFN">Tap to upload ID photo</span>
-            <input type="file" id="idFile" accept="image/*">
-          </label>
+          <label>Driver's Licence Photo</label>
+          <div class="upload-zone" id="licUploadZone">
+            <input type="file" id="licUpload" accept="image/*">
+            <i class="fas fa-car"></i>
+            <span id="licUploadLbl">Tap to upload Driver's Licence</span>
+          </div>
         </div>
         <div class="fg">
-          <label><i class="fas fa-file-alt" style="color:#f39c12;margin-right:4px"></i>Vehicle Registry Document</label>
-          <label class="upload-lbl" id="vregLbl">
-            <i class="fas fa-file-alt"></i><span class="fn" id="vregFN">Tap to upload vehicle registry</span>
-            <input type="file" id="vregFile" accept="image/*,application/pdf">
-          </label>
+          <label>Vehicle Registry Document <span style="color:#e74c3c;font-size:.7rem">*Required</span></label>
+          <div class="upload-zone" id="regUploadZone">
+            <input type="file" id="regUpload" accept="image/*,application/pdf">
+            <i class="fas fa-file-alt" style="color:#9b59b6"></i>
+            <span id="regUploadLbl">Tap to upload Vehicle Registry</span>
+          </div>
         </div>
-        <div class="fg" style="background:#1a2535;border:1px solid #2e3f55;border-radius:14px;padding:.85rem">
-          <label style="color:#f39c12;font-size:.72rem;font-weight:700;display:flex;align-items:center;gap:5px;margin-bottom:.7rem"><i class="fas fa-university"></i> Bank Account Details</label>
-          <div class="fg"><label>Bank Name</label><input class="fi" type="text" id="rBank" placeholder="e.g. Bank of Maldives"></div>
-          <div class="fg"><label>Account Name</label><input class="fi" type="text" id="rAccName" placeholder="Full account name"></div>
-          <div class="fg" style="margin-bottom:0"><label>Account Number</label><input class="fi" type="text" id="rAccNo" placeholder="Account number"></div>
+        <div class="fg">
+          <label>Vehicle Photo <span style="color:rgba(255,255,255,.35);font-size:.68rem">(optional)</span></label>
+          <div class="upload-zone" id="vehPhotoZone">
+            <input type="file" id="vehPhotoUpload" accept="image/*">
+            <i class="fas fa-car" style="color:#3498db"></i>
+            <span id="vehPhotoLbl">Tap to upload vehicle photo</span>
+          </div>
         </div>
-        <button class="btn btn-gold" id="regBtn" style="margin-top:.88rem"><i class="fas fa-user-plus"></i> Register as Driver</button>
+        <button class="btn btn-gold" id="regBtn"><i class="fas fa-user-plus"></i> Register as Driver</button>
       </div>
     </div>
   </div>
 </div>
+</div>
+
+<!-- STATUS SCREEN (shown between login and dashboard) -->
+<div id="statusScreen" style="display:none;min-height:100vh;background:#0a0f1e;align-items:center;justify-content:center;padding:1.5rem;position:relative">
+  <div style="max-width:400px;width:100%;text-align:center">
+    <!-- Logo -->
+    <div style="margin-bottom:2rem">
+      <div style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:2rem" id="statusIcon"></div>
+      <div style="font-size:1.1rem;font-weight:800;color:white" id="statusTitle"></div>
+      <div style="font-size:.78rem;color:rgba(255,255,255,.45);margin-top:.4rem;line-height:1.7" id="statusDesc"></div>
+    </div>
+    <!-- Status card -->
+    <div id="statusCard" style="border-radius:20px;padding:1.5rem;margin-bottom:1.5rem;border:2px solid">
+      <div id="statusCardContent"></div>
+    </div>
+    <!-- Actions -->
+    <div id="statusActions"></div>
+    <button onclick="doLogout()" style="margin-top:1rem;background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);border-radius:22px;padding:8px 22px;font-size:.76rem;cursor:pointer;font-family:inherit"><i class="fas fa-sign-out-alt" style="margin-right:5px"></i>Sign Out</button>
+  </div>
 </div>
 
 <!-- DRIVER APP -->
 <div id="driverApp">
   <div class="top-bar">
-    <div class="tb-brand"><i class="fas fa-motorcycle" style="color:#f39c12"></i> Easy<span>Cargo</span></div>
-    <div class="status-chip sc-active" id="statusChip">Active</div>
-    <div class="n-bell"><div class="n-bell-btn" id="nBtn"><i class="fas fa-bell"></i></div><div class="n-dot" id="nDot"></div></div>
-    <button class="btn-ico" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i></button>
+    <div class="tb-brand"><i class="fas fa-truck-fast" style="color:#f39c12"></i> Easy<span>Cargo</span> <span style="font-size:.6rem;color:rgba(255,255,255,.3);font-weight:400;font-family:monospace;margin-left:2px">DRIVER</span></div>
+    <div class="user-chip" onclick="switchTab('sProfile')">
+      <div class="user-av"><i class="fas fa-user"></i></div>
+      <div class="user-nm" id="drvName">Driver</div>
+    </div>
+    <div class="rel-wrap">
+      <button class="btn-ico" id="notifBtn" onclick="switchTab('sNotif')"><i class="fas fa-bell"></i></button>
+      <div class="n-dot" id="notifDot"></div>
+    </div>
+    <button class="btn-ico" onclick="doLogout()" title="Sign Out"><i class="fas fa-sign-out-alt"></i></button>
   </div>
-  <div class="nav-bar"><div class="nav-tabs">
-    <button class="ntab active" data-s="sHome"><i class="fas fa-home"></i> Home</button>
-    <button class="ntab" data-s="sJobs"><i class="fas fa-truck-fast"></i> Available</button>
-    <button class="ntab" data-s="sMine"><i class="fas fa-list"></i> My Jobs</button>
-    <button class="ntab" data-s="sEarn"><i class="fas fa-coins"></i> Earnings</button>
-    <button class="ntab" data-s="sProfile"><i class="fas fa-user"></i> Profile</button>
-  </div></div>
+
   <div class="content">
-    <div class="sec active" id="sHome">
-      <div class="sec-title"><i class="fas fa-gauge-high"></i> Dashboard</div>
-      <div class="sg" id="homeStats"></div>
-      <div id="activeJobWrap" style="display:none">
-        <div class="sec-title"><i class="fas fa-truck-fast" style="color:#27ae60"></i> Active Job</div>
-        <div id="activeJobCard"></div>
-      </div>
-      <div class="card">
-        <div class="c-hd"><div class="c-ico"><i class="fas fa-motorcycle"></i></div><h3 id="drvNameHd">Driver</h3></div>
-        <div class="i-grid" id="drvInfoGrid"></div>
-      </div>
+    <!-- AVAILABLE ORDERS -->
+    <div class="sec active" id="sOrders">
+      <div class="sec-title"><i class="fas fa-box-open"></i> Available Orders</div>
+      <div id="availableOrdersList"></div>
     </div>
-    <div class="sec" id="sJobs">
-      <div class="sec-title"><i class="fas fa-truck-fast"></i> Available Deliveries</div>
-      <p style="font-size:.74rem;color:rgba(255,255,255,.42);margin-bottom:.75rem;line-height:1.5">Deliveries open for all drivers — first to accept gets it.</p>
-      <div id="jobsList"><div class="empty-s"><i class="fas fa-truck-fast"></i><p>No available deliveries right now</p></div></div>
-    </div>
+
+    <!-- MY DELIVERIES -->
     <div class="sec" id="sMine">
-      <div class="sec-title"><i class="fas fa-list"></i> My Deliveries</div>
-      <div id="myJobsList"><div class="empty-s"><i class="fas fa-inbox"></i><p>No deliveries assigned yet</p></div></div>
+      <div class="sec-title"><i class="fas fa-route"></i> My Deliveries</div>
+      <div class="stats-row">
+        <div class="stat-card" style="--sc:#f39c12"><div class="stat-lbl">Active</div><div class="stat-val" id="statActive">0</div></div>
+        <div class="stat-card" style="--sc:#27ae60"><div class="stat-lbl">Completed</div><div class="stat-val" id="statDone">0</div></div>
+      </div>
+      <div id="myDeliveriesList"></div>
     </div>
+
+    <!-- EARNINGS -->
     <div class="sec" id="sEarn">
-      <div class="sec-title"><i class="fas fa-coins"></i> My Earnings</div>
-      <div class="sg" id="earnStats"></div>
-      <div class="card">
-        <div class="c-hd"><div class="c-ico"><i class="fas fa-university"></i></div><h3>Bank Account</h3></div>
-        <div id="bankDetails"></div>
-        <div id="paySlipsWrap" style="margin-top:.75rem"></div>
+      <div class="sec-title"><i class="fas fa-wallet"></i> My Earnings</div>
+      <!-- Earnings stats grid -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:.9rem">
+        <div style="background:#141b2b;border-radius:16px;padding:.85rem .7rem;text-align:center;border:1.5px solid rgba(243,156,18,.2);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#f39c12"></div>
+          <div style="font-size:.55rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.8px;font-family:monospace;margin-bottom:4px">Total</div>
+          <div style="font-weight:900;color:#f39c12;font-family:monospace;font-size:1.2rem" id="totalEarned">MVR 0</div>
+        </div>
+        <div style="background:#141b2b;border-radius:16px;padding:.85rem .7rem;text-align:center;border:1.5px solid rgba(231,76,60,.2);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#e74c3c"></div>
+          <div style="font-size:.55rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.8px;font-family:monospace;margin-bottom:4px">Pending</div>
+          <div style="font-weight:900;color:#e74c3c;font-family:monospace;font-size:1.2rem" id="earnPending">MVR 0</div>
+        </div>
+        <div style="background:#141b2b;border-radius:16px;padding:.85rem .7rem;text-align:center;border:1.5px solid rgba(39,174,96,.2);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#27ae60"></div>
+          <div style="font-size:.55rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.8px;font-family:monospace;margin-bottom:4px">Paid</div>
+          <div style="font-weight:900;color:#27ae60;font-family:monospace;font-size:1.2rem" id="earnPaid">MVR 0</div>
+        </div>
       </div>
+      <div id="pendingEarned" style="display:none"></div>
       <div class="card">
-        <div class="c-hd"><div class="c-ico"><i class="fas fa-history"></i></div><h3>Delivery History</h3></div>
-        <div id="earnList"><div class="empty-s"><i class="fas fa-coins"></i><p>No completed deliveries yet</p></div></div>
+        <div class="c-hd"><div class="c-ico" style="background:rgba(39,174,96,.1);border-color:rgba(39,174,96,.2)"><i class="fas fa-list-check" style="color:#27ae60"></i></div><h3>Payment History</h3></div>
+        <div id="earningsList"></div>
       </div>
     </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="sec" id="sNotif">
+      <div class="sec-title"><i class="fas fa-bell"></i> Notifications</div>
+      <div id="notifList"></div>
+    </div>
+
+    <!-- PROFILE -->
     <div class="sec" id="sProfile">
-      <div class="sec-title"><i class="fas fa-user"></i> My Profile</div>
-      <div class="card">
-        <div class="c-hd"><div class="c-ico"><i class="fas fa-id-card"></i></div><h3>Driver Information</h3></div>
-        <div class="i-grid" id="profileGrid"></div>
+      <div class="sec-title"><i class="fas fa-user-circle"></i> My Profile</div>
+      <!-- Profile hero with photo -->
+      <div class="profile-hero" style="position:relative">
+        <div class="profile-av" id="profileAvatar" onclick="triggerProfilePhoto()" style="cursor:pointer;position:relative">
+          <img id="profilePhotoImg" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%">
+          <i class="fas fa-user" id="profilePhotoIcon"></i>
+          <div style="position:absolute;bottom:0;right:0;width:22px;height:22px;background:#f39c12;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;border:2px solid #141b2b"><i class="fas fa-camera" style="color:#1e2a3a"></i></div>
+        </div>
+        <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="uploadProfilePhoto(this)">
+        <div class="profile-name" id="profileName">—</div>
+        <div class="profile-contact" id="profileContact">—</div>
+        <div id="profileStatusBadge"></div>
       </div>
+
+      <!-- Document Upload Card -->
       <div class="card">
-        <div class="c-hd"><div class="c-ico"><i class="fas fa-university"></i></div><h3>Bank Details</h3></div>
+        <div class="c-hd"><div class="c-ico" style="background:rgba(243,156,18,.1);border-color:rgba(243,156,18,.2)"><i class="fas fa-id-card" style="color:#f39c12"></i></div><h3>Documents</h3><span style="margin-left:auto;font-size:.65rem;color:rgba(255,255,255,.3)">Tap to update</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px" id="docUploadList">
+          <!-- Rendered by renderDocUploads() -->
+        </div>
+      </div>
+
+      <!-- Verification status -->
+      <div class="card">
+        <div class="c-hd"><div class="c-ico"><i class="fas fa-shield-halved"></i></div><h3>Verification Status</h3></div>
+        <div id="profileDocs"></div>
+      </div>
+
+      <!-- Bank Details -->
+      <div class="card">
+        <div class="c-hd"><div class="c-ico" style="background:rgba(39,174,96,.1);border-color:rgba(39,174,96,.2)"><i class="fas fa-building-columns" style="color:#27ae60"></i></div><h3>Bank Details</h3></div>
         <div id="profileBank"></div>
-        <button class="btn btn-sec" style="margin-top:.85rem;font-size:.78rem" onclick="openBankEdit()"><i class="fas fa-pen"></i> Edit Bank Details</button>
       </div>
-      <div class="card">
-        <div class="c-hd"><div class="c-ico"><i class="fas fa-file-image"></i></div><h3>My Documents</h3></div>
-        <div id="docsList"></div>
-      </div>
-      <button class="btn btn-sec" style="font-size:.78rem;margin-top:.5rem" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+
+      <button class="btn btn-sec" style="margin-top:.5rem" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
     </div>
   </div>
+
   <nav class="mob-nav">
-    <button class="m-tab active" data-s="sHome"><i class="fas fa-home"></i>Home</button>
-    <button class="m-tab" data-s="sJobs"><i class="fas fa-truck-fast"></i>Available</button>
-    <button class="m-tab" data-s="sMine"><i class="fas fa-list"></i>My Jobs</button>
-    <button class="m-tab" data-s="sEarn"><i class="fas fa-coins"></i>Earnings</button>
+    <button class="m-tab active" data-s="sOrders"><i class="fas fa-box-open"></i>Orders</button>
+    <button class="m-tab" data-s="sMine"><i class="fas fa-route"></i>Mine</button>
+    <button class="m-tab" data-s="sEarn"><i class="fas fa-wallet"></i>Earnings</button>
+    <button class="m-tab" data-s="sNotif"><i class="fas fa-bell"></i>Alerts</button>
     <button class="m-tab" data-s="sProfile"><i class="fas fa-user"></i>Profile</button>
   </nav>
 </div>
 
-<!-- NOTIFICATION PANEL -->
-<div class="n-panel" id="nPanel">
-  <div class="n-hd"><div class="n-hd-t"><i class="fas fa-bell"></i> Notifications</div><div style="display:flex;align-items:center;gap:7px"><button id="nClearAll" style="background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.22);color:#e74c3c;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:12px;cursor:pointer;font-family:inherit">Clear All</button><button class="n-close" id="nClose"><i class="fas fa-times"></i></button></div></div>
-  <div class="n-list" id="nList"></div>
-</div>
-
-<!-- STATUS UPDATE MODAL -->
-<div class="modal-overlay" id="statMod">
-<div class="modal-box">
-  <div class="modal-hd"><div class="modal-title"><i class="fas fa-pen-to-square"></i> Update Status</div><button class="close-btn" id="statClose"><i class="fas fa-times"></i></button></div>
-  <div id="statDelInfo" style="background:#1a2535;border-radius:11px;padding:.75rem;margin-bottom:.8rem;font-size:.76rem;color:rgba(255,255,255,.6)"></div>
-  <div class="fg" style="margin-bottom:.85rem"><label>Status</label>
-    <select id="statSel" class="fi"><option value="Processing">Processing</option><option value="In Transit">In Transit</option><option value="Out for Delivery">Out for Delivery</option><option value="Delivered">Delivered</option></select>
-  </div>
-  <div id="proofBox" style="display:none">
-    <div class="fg">
-      <label><i class="fas fa-camera" style="color:#f39c12;margin-right:4px"></i>Delivery Proof Photo (Required)</label>
-      <label class="upload-lbl" id="proofLbl"><i class="fas fa-camera"></i><span class="fn" id="proofFN">Tap to take photo</span><input type="file" id="proofFile" accept="image/*"></label>
+<!-- STATUS UPDATE MODAL (driver) -->
+<div class="modal-overlay" id="completeMod">
+  <div class="modal-box">
+    <div class="modal-hd"><div class="modal-title"><i class="fas fa-pen-to-square" style="color:#f39c12"></i> Update Status</div><button class="close-btn" id="completeClose"><i class="fas fa-times"></i></button></div>
+    <!-- Status select -->
+    <div style="margin-bottom:.85rem">
+      <label style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:.4rem">Delivery Status</label>
+      <select id="drvStatusSel" class="fi" style="border-radius:14px">
+        <option value="Processing">Processing</option>
+        <option value="In Transit">In Transit</option>
+        <option value="Out for Delivery">Out for Delivery</option>
+        <option value="Delivered">Delivered</option>
+      </select>
     </div>
-
+    <!-- Proof upload — shown only for Delivered -->
+    <div id="drvProofBox" style="display:none;margin-bottom:.85rem">
+      <label style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:.4rem">Delivery Proof <span style="color:#e74c3c">(Required)</span></label>
+      <div class="upload-zone" id="proofUploadZone">
+        <input type="file" id="proofUpload" accept="image/*">
+        <i class="fas fa-camera" style="color:#f39c12"></i>
+        <span id="proofUploadLbl">Tap to attach proof photo</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sec" style="flex:1" id="completeCancel"><i class="fas fa-times"></i> Cancel</button>
+      <button class="btn btn-gold" style="flex:2" id="completeConfirm"><i class="fas fa-check"></i> Update</button>
+    </div>
+    <input type="hidden" id="completeOrderId">
   </div>
-  <div class="modal-btns"><button class="btn btn-sec" style="flex:1" id="statCancel">Cancel</button><button class="btn btn-gold" style="flex:2" id="statConfirm"><i class="fas fa-check"></i> Update</button></div>
-</div>
 </div>
 
-<!-- SLIP VIEW MODAL -->
-<div class="modal-overlay" id="slipViewMod" style="background:rgba(0,0,0,.97)">
-<div class="modal-box" style="text-align:center;padding:.85rem">
-  <div class="modal-hd" style="margin-bottom:.7rem"><div class="modal-title"><i class="fas fa-receipt"></i> Payment Slip</div><button class="close-btn" id="slipViewClose"><i class="fas fa-times"></i></button></div>
-  <img id="slipViewImg" alt="slip" style="max-width:100%;max-height:62vh;border-radius:12px;border:1.5px solid rgba(39,174,96,.35);display:block;margin:0 auto">
-  <div id="slipViewAmt" style="font-size:1.15rem;font-weight:900;color:#27ae60;margin-top:.65rem"></div>
-  <div id="slipViewDate" style="font-size:.68rem;color:rgba(255,255,255,.35);margin-top:3px;font-family:monospace"></div>
-  <div class="modal-btns" style="margin-top:.75rem"><button class="btn btn-sec" id="slipViewClose2" style="max-width:200px;margin:0 auto">Close</button></div>
-</div>
-</div>
-
-<!-- BANK EDIT MODAL -->
-<div class="modal-overlay" id="bankMod">
-<div class="modal-box">
-  <div class="modal-hd"><div class="modal-title"><i class="fas fa-university"></i> Edit Bank Details</div><button class="close-btn" id="bankClose"><i class="fas fa-times"></i></button></div>
-  <div class="fg"><label>Bank Name</label><input class="fi" type="text" id="bBankName" placeholder="e.g. Bank of Maldives"></div>
-  <div class="fg"><label>Account Name</label><input class="fi" type="text" id="bAccName" placeholder="Full account name"></div>
-  <div class="fg" style="margin-bottom:0"><label>Account Number</label><input class="fi" type="text" id="bAccNo" placeholder="Account number"></div>
-  <div class="modal-btns"><button class="btn btn-sec" style="flex:1" id="bankCancel">Cancel</button><button class="btn btn-gold" style="flex:2" id="bankConfirm"><i class="fas fa-save"></i> Save</button></div>
-</div>
-</div>
-
-<div class="toast" id="toast"><div class="t-ico"><i class="fas fa-info-circle"></i></div><div class="t-msg" id="tTxt"></div></div>
+<div class="toast" id="toast"><div class="t-ico"></div><div class="t-msg" id="tTxt"></div></div>
 
 <script>
 const fbCfg={apiKey:"AIzaSyCZA8Z9AJcC97CyQUZVCRsljTuYBfxjHMw",authDomain:"easycargo-9c0cd.firebaseapp.com",databaseURL:"https://easycargo-9c0cd-default-rtdb.firebaseio.com",projectId:"easycargo-9c0cd",storageBucket:"easycargo-9c0cd.firebasestorage.app",messagingSenderId:"51689325187",appId:"1:51689325187:web:c65cb8fb0af2241a4c91b6"};
 firebase.initializeApp(fbCfg);
 const db=firebase.database();
-let me=null,allD=[],allNotifs=[],siteSettings={},curStatId=null,slideIdx=0,slideTimer=null;
-let idData='',vregData='',prevNotifCount=0,prevOpenCount=0;
+const TBOT='8417757176:AAEWgzN_MK9ljtV9WN4vtW1ag9ZoYEsY6Ck';
+const TCIDS=[965429044,7307324767,319043357];
+
+let me=null,allOrders=[],allDriverPayments=[],allNotifs=[],driverSettings={};
+
 const $=id=>document.getElementById(id);
 function toArr(d){return d?(Array.isArray(d)?d:Object.values(d)):[]}
-function fmtD(d){return d?new Date(d).toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'}):'---'}
-function timeAgo(ts){if(!ts)return'';const s=Math.floor((Date.now()-new Date(ts))/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago'}
-function showToast(m,t='info'){const el=$('toast');el.className='toast '+t;$('tTxt').textContent=m;el.querySelector('.t-ico').innerHTML=t==='ok'?'<i class="fas fa-check-circle"></i>':t==='err'?'<i class="fas fa-times-circle"></i>':'<i class="fas fa-info-circle"></i>';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3200)}
-function showMsg(id,msg,t){const el=$(id);el.className='msg '+t;el.textContent=msg;setTimeout(()=>el.className='msg',4000)}
-function sBadge(s){const m={'Order Placed':'b-placed','Processing':'b-proc','In Transit':'b-trans','Out for Delivery':'b-out','Delivered':'b-del'};return'<span class="badge '+(m[s]||'b-placed')+'">'+s+'</span>'}
+function fmtD(d){return d?new Date(d).toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'}):'—'}
+function showToast(m,t='info'){const el=$('toast');el.className=`toast ${t}`;$('tTxt').textContent=m;el.querySelector('.t-ico').innerHTML=t==='ok'?'<i class="fas fa-check-circle"></i>':t==='err'?'<i class="fas fa-times-circle"></i>':'<i class="fas fa-info-circle"></i>';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3200)}
+function showMsg(id,m,t){const el=$(id);el.className=`msg ${t}`;el.textContent=m;setTimeout(()=>el.className='msg',4000)}
 
-/* SOUND + VIBRATION */
-function playAlert(){
-  if(navigator.vibrate)navigator.vibrate([200,100,200,100,400]);
-  try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    [880,1100,880].forEach(function(freq,i){
-      const osc=ctx.createOscillator();const gain=ctx.createGain();
-      osc.connect(gain);gain.connect(ctx.destination);
-      osc.type='sine';osc.frequency.value=freq;
-      const t=ctx.currentTime+i*0.18;
-      gain.gain.setValueAtTime(0.4,t);gain.gain.exponentialRampToValueAtTime(0.001,t+0.15);
-      osc.start(t);osc.stop(t+0.15);
-    });
-  }catch(e){}
-}
+/* ── PLANE INTRO ── */
+/* Vehicle types from admin */
+let driverVehicleTypes=[];
+const DEFAULT_VEHICLES=[
+  {name:'Bicycle',icon:'fa-bicycle',color:'#27ae60'},
+  {name:'Motorcycle',icon:'fa-motorcycle',color:'#f39c12'},
+  {name:'Car',icon:'fa-car',color:'#3498db'},
+  {name:'Van',icon:'fa-van-shuttle',color:'#9b59b6'},
+  {name:'Truck',icon:'fa-truck',color:'#e67e22'},
+  {name:'Boat',icon:'fa-ship',color:'#1abc9c'}
+];
 
-/* HOME PAGE */
-function initSlideshow(){
-  const slides=siteSettings.driverSlides&&siteSettings.driverSlides.length?siteSettings.driverSlides:(siteSettings.homeSlides||[]);
-  const ss=$('slideshow');const dots=$('slideDots');
-  if(siteSettings.driverTagline)$('homeTagline').textContent=siteSettings.driverTagline;
-  else if(siteSettings.homeTagline)$('homeTagline').textContent=siteSettings.homeTagline;
-  // also reload slides when settings update
-
-  if(!slides.length){ss.innerHTML='<div class="slide active" style="background:linear-gradient(135deg,#0a0f1e,#1a2747)"></div>';dots.innerHTML='';return}
-  ss.innerHTML=slides.map(function(s,i){return'<div class="slide'+(i===0?' active':'')+'" style="background-image:url(\''+(s.url||s)+'\')"></div>'}).join('');
-  dots.innerHTML=slides.map(function(_,i){return'<div class="dot'+(i===0?' active':'')+'" onclick="gotoSlide('+i+')"></div>'}).join('');
-  clearInterval(slideTimer);slideTimer=setInterval(function(){gotoSlide((slideIdx+1)%slides.length)},5000);
-}
-window.gotoSlide=function(i){var sl=document.querySelectorAll('.slide');var ds=document.querySelectorAll('.dot');if(!sl.length)return;sl[slideIdx]&&sl[slideIdx].classList.remove('active');ds[slideIdx]&&ds[slideIdx].classList.remove('active');slideIdx=i;sl[i]&&sl[i].classList.add('active');ds[i]&&ds[i].classList.add('active');}
-function loadHowTo(){
-  var imgs=siteSettings.driverHowToImages||siteSettings.howToImages||[];
-  var el=$('howImgGrid');
-  if(!imgs.length){el.innerHTML='<div class="how-empty">No guide images yet.</div>';return}
-  el.innerHTML=imgs.map(function(img){return'<div class="how-img-item"><img src="'+(img.url||img)+'" loading="lazy"></div>'}).join('');
-}
-window.toggleHow=function(){$('howPanel').classList.toggle('open')}
-window.showAuth=function(){$('homePage').style.display='none';$('authScreen').classList.add('show')}
-
-/* FILE UPLOADS */
-$('idFile').addEventListener('change',function(){readFile(this,'idLbl','idFN',function(r){idData=r;})});
-$('vregFile').addEventListener('change',function(){readFile(this,'vregLbl','vregFN',function(r){vregData=r;})});
-$('proofFile').addEventListener('change',function(){if(this.files[0]){$('proofFN').textContent=this.files[0].name;$('proofLbl').className='upload-lbl done';}});
-
-function readFile(input,lblId,fnId,cb){if(!input.files[0])return;var rd=new FileReader();rd.onload=function(e){cb(e.target.result);$(lblId).className='upload-lbl done';$(fnId).textContent=input.files[0].name;};rd.readAsDataURL(input.files[0]);}
-
-/* AUTH */
-$('tLogin').onclick=function(){$('tLogin').classList.add('active');$('tReg').classList.remove('active');$('pLogin').classList.add('active');$('pReg').classList.remove('active')};
-$('tReg').onclick=function(){$('tReg').classList.add('active');$('tLogin').classList.remove('active');$('pReg').classList.add('active');$('pLogin').classList.remove('active')};
-
-$('loginBtn').onclick=async function(){
-  var u=$('lUsr').value.trim(),p=$('lPwd').value;
-  if(!u||!p){showMsg('loginMsg','Fill all fields','err');return}
-  $('loginBtn').disabled=true;$('loginBtn').innerHTML='<i class="fas fa-spinner fa-spin"></i>';
-  var snap=await db.ref('drivers').once('value');
-  var drivers=toArr(snap.val());
-  var f=drivers.find(function(d){return(d.contact===u||d.name===u)&&d.password===p;});
-  $('loginBtn').disabled=false;$('loginBtn').innerHTML='<i class="fas fa-sign-in-alt"></i> Sign In';
-  if(!f){showMsg('loginMsg','Invalid credentials','err');return}
-  if(f.status==='pending'){$('pLogin').innerHTML='<div class="pending-box"><i class="fas fa-hourglass-half"></i><h3>Pending Approval</h3><p>Your registration is under review. You will be notified once approved.</p></div><button class="btn btn-sec" style="margin-top:.8rem" onclick="location.reload()"><i class="fas fa-arrow-left"></i> Back</button>';return}
-  if(f.status==='blocked'){showMsg('loginMsg','Your account has been blocked. Contact admin.','err');return}
-  me=f;localStorage.setItem('ecDriver',JSON.stringify(f));enterApp();
-};
-
-$('regBtn').onclick=async function(){
-  var name=$('rName').value.trim(),cnt=$('rCnt').value.trim(),veh=$('rVeh').value.trim();
-  var p=$('rPwd').value,cf=$('rCfm').value;
-  var bank=$('rBank').value.trim(),accName=$('rAccName').value.trim(),accNo=$('rAccNo').value.trim();
-  if(!name||!cnt||!p||!cf){showMsg('regMsg','Fill all required fields','err');return}
-  if(p!==cf){showMsg('regMsg','Passwords do not match','err');return}
-  if(!idData){showMsg('regMsg','Please upload your ID photo','err');return}
-  if(!vregData){showMsg('regMsg','Please upload vehicle registry','err');return}
-  $('regBtn').disabled=true;$('regBtn').innerHTML='<i class="fas fa-spinner fa-spin"></i> Registering...';
-  var snap=await db.ref('drivers').once('value');
-  var drivers=toArr(snap.val());
-  if(drivers.find(function(d){return d.contact===cnt;})){showMsg('regMsg','Contact already registered','err');$('regBtn').disabled=false;$('regBtn').innerHTML='<i class="fas fa-user-plus"></i> Register as Driver';return}
-  var newDriver={id:'DRV'+Date.now(),name:name,contact:cnt,vehicle:veh,password:p,status:'pending',createdAt:new Date().toISOString(),totalEarned:0,defaultAmount:0,idPhoto:idData,vehicleRegistry:vregData,bank:{bankName:bank,accountName:accName,accountNumber:accNo}};
-  drivers.push(newDriver);
-  await db.ref('drivers').set(drivers);
-  $('regBtn').disabled=false;$('regBtn').innerHTML='<i class="fas fa-user-plus"></i> Register as Driver';
-  showMsg('regMsg','Registered! Awaiting admin approval.','ok');
-  $('tLogin').click();
-};
-
-window.addEventListener('DOMContentLoaded',function(){
-  var s=localStorage.getItem('ecDriver');
-  if(s){me=JSON.parse(s);$('homePage').style.display='none';enterApp();}
-  db.ref('siteSettings').once('value').then(function(snap){siteSettings=snap.val()||{};initSlideshow();loadHowTo();});
+db.ref('driverVehicleTypes').on('value',snap=>{
+  driverVehicleTypes=toArr(snap.val());
+  loadVehicleGrid();
 });
 
-function enterApp(){
-  $('homePage').style.display='none';$('authScreen').classList.remove('show');$('driverApp').style.display='block';
-  $('drvNameHd').textContent=me.name;
-  var chip=$('statusChip');chip.textContent=me.status==='active'?'Active':'Pending';
-  chip.className='status-chip '+(me.status==='active'?'sc-active':'sc-pending');
-  initFB();
+function loadVehicleGrid(){
+  const g=$('vehicleGrid');if(!g)return;
+  const vehicles=driverVehicleTypes.length?driverVehicleTypes:DEFAULT_VEHICLES;
+  g.innerHTML=vehicles.map(v=>`<button type="button" onclick="selVehicle(this,'${v.name}')" style="background:#1e2a3a;border:2px solid #2e3f55;border-radius:14px;padding:.75rem .5rem;cursor:pointer;text-align:center;transition:.22s;font-family:inherit;position:relative" data-v="${v.name}">
+    <i class="fas ${v.icon||'fa-truck'}" style="font-size:1.3rem;color:${v.color||'#f39c12'};display:block;margin-bottom:5px"></i>
+    <div style="font-size:.65rem;font-weight:700;color:white;line-height:1.2">${v.name}</div>
+  </button>`).join('');
+}
+window.selVehicle=function(el,name){
+  document.querySelectorAll('#vehicleGrid button').forEach(b=>{b.style.borderColor='#2e3f55';b.style.background='#1e2a3a';});
+  el.style.borderColor='#f39c12';el.style.background='rgba(243,156,18,.1)';
+  $('rVehicle').value=name;
+};
+
+/* Status screen — shown after login based on verification */
+function showStatusScreen(driver){
+  const vs=driver.verificationStatus||'pending_review';
+  const screen=$('statusScreen');
+  if(!screen)return;
+
+  if(vs==='verified'&&driver.status==='active'){
+    // Show green verified then go to dashboard
+    screen.style.display='flex';
+    const icon=$('statusIcon');const title=$('statusTitle');const desc=$('statusDesc');
+    const card=$('statusCard');const content=$('statusCardContent');const actions=$('statusActions');
+    icon.style.background='rgba(39,174,96,.15)';icon.style.border='2px solid rgba(39,174,96,.4)';icon.innerHTML='<i class="fas fa-check-circle" style="color:#27ae60"></i>';
+    title.textContent='Account Verified! ✅';title.style.color='#27ae60';
+    desc.textContent='Your driver account has been verified. Welcome to EasyCargo Driver!';
+    card.style.borderColor='rgba(39,174,96,.3)';card.style.background='rgba(39,174,96,.05)';
+    content.innerHTML=`<div style="font-size:.82rem;color:rgba(255,255,255,.7);margin-bottom:.5rem">Welcome, <strong style="color:#27ae60">${driver.name}</strong>!</div>
+      <div style="font-size:.74rem;color:rgba(255,255,255,.5);line-height:1.7">You can now take delivery orders and earn money. Your payments will be processed as per the schedule.</div>`;
+    actions.innerHTML=`<button onclick="proceedToDash()" style="width:100%;background:linear-gradient(135deg,#27ae60,#2ecc71);color:white;border:none;border-radius:22px;padding:14px;font-weight:800;font-size:.92rem;cursor:pointer;font-family:inherit"><i class="fas fa-arrow-right" style="margin-right:7px"></i>Go to Dashboard</button>`;
+    // Auto proceed after 2.5s
+    setTimeout(proceedToDash, 2500);
+  } else if(vs==='rejected'){
+    screen.style.display='flex';
+    $('statusIcon').style.background='rgba(231,76,60,.15)';$('statusIcon').style.border='2px solid rgba(231,76,60,.4)';$('statusIcon').innerHTML='<i class="fas fa-times-circle" style="color:#e74c3c"></i>';
+    $('statusTitle').textContent='Verification Rejected ❌';$('statusTitle').style.color='#e74c3c';
+    $('statusDesc').textContent='Your documents were not approved. Please contact EasyCargo support.';
+    $('statusCard').style.borderColor='rgba(231,76,60,.3)';$('statusCard').style.background='rgba(231,76,60,.05)';
+    $('statusCardContent').innerHTML=`<div style="font-size:.78rem;color:rgba(255,255,255,.6);line-height:1.7">Your ID or licence documents did not pass our verification. Please contact EasyCargo support or re-register with correct documents.</div>
+      <div style="margin-top:.75rem;font-size:.72rem;color:#e74c3c;font-family:monospace">Contact: +960XXXXXXX</div>`;
+    $('statusActions').innerHTML='';
+  } else {
+    // Pending — show RED pending screen
+    screen.style.display='flex';
+    $('statusIcon').style.background='rgba(231,76,60,.15)';$('statusIcon').style.border='2px solid rgba(231,76,60,.35)';$('statusIcon').innerHTML='<i class="fas fa-hourglass-half" style="color:#e74c3c"></i>';
+    $('statusTitle').textContent='Pending Verification';$('statusTitle').style.color='#e74c3c';
+    $('statusDesc').textContent='Your account is under review. Admin will verify your documents within 24 hours.';
+    $('statusCard').style.borderColor='rgba(231,76,60,.25)';$('statusCard').style.background='rgba(231,76,60,.05)';
+    $('statusCardContent').innerHTML=`<div style="margin-bottom:.85rem">
+        <div style="display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
+          <div style="width:8px;height:8px;border-radius:50%;background:#e74c3c;flex-shrink:0;animation:pendingPulse 1.5s infinite"></div>
+          <div style="font-size:.76rem;color:rgba(255,255,255,.7)">Account status: <strong style="color:#e74c3c">Pending Verification</strong></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
+          <i class="fas fa-id-card" style="color:#f39c12;width:16px;text-align:center"></i>
+          <div style="font-size:.76rem;color:rgba(255,255,255,.6)">ID / Passport: <span style="color:${driver.idDoc?'#27ae60':'#e74c3c'}">${driver.idDoc?'Uploaded ✓':'Not uploaded'}</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:.6rem 0">
+          <i class="fas fa-car" style="color:#3498db;width:16px;text-align:center"></i>
+          <div style="font-size:.76rem;color:rgba(255,255,255,.6)">Driver Licence: <span style="color:${driver.licenceDoc?'#27ae60':'#e74c3c'}">${driver.licenceDoc?'Uploaded ✓':'Not uploaded'}</span></div>
+        </div>
+      </div>
+      <div style="font-size:.72rem;color:rgba(255,255,255,.4);line-height:1.6">⏱ Verification takes up to 24 hours. You'll receive a notification once approved.</div>`;
+    $('statusActions').innerHTML=`<button onclick="refreshStatus()" style="width:100%;background:rgba(231,76,60,.12);border:1.5px solid rgba(231,76,60,.3);color:#e74c3c;border-radius:22px;padding:12px;font-weight:700;font-size:.84rem;cursor:pointer;font-family:inherit"><i class="fas fa-rotate-right" style="margin-right:7px"></i>Refresh Status</button>`;
+  }
 }
 
-function initFB(){
-  db.ref('cargoDeliveries').on('value',function(snap){
-    allD=toArr(snap.val());
-    var open=allD.filter(function(d){return d.driverStatus==='open'&&d.paymentStatus==='paid'&&!(d.passedBy||[]).includes(me.id);}).length;
-    if(open>prevOpenCount&&prevOpenCount!==0){playAlert();showToast('New delivery available!','info');}
-    prevOpenCount=open;
-    refreshAll();
-  });
-  db.ref('driverNotifications').on('value',function(snap){
-    allNotifs=toArr(snap.val());
-    var unread=allNotifs.filter(function(n){return n.driverId===me.id&&!n.read;}).length;
-    if(unread>prevNotifCount){playAlert();}
-    prevNotifCount=unread;
-    loadNotifs();
-  });
-  db.ref('siteSettings').on('value',function(snap){siteSettings=snap.val()||{};});
-  db.ref('drivers').on('value',function(snap){
-    var drivers=toArr(snap.val());
-    var updated=drivers.find(function(d){return d.id===me.id;});
-    if(updated){me=updated;localStorage.setItem('ecDriver',JSON.stringify(me));loadEarnings();loadProfile();}
-  });
-}
+window.proceedToDash=function(){
+  $('statusScreen').style.display='none';
+  initApp();
+};
 
-function refreshAll(){loadHomeStats();loadActiveJob();loadAvailableJobs();loadMyJobs();loadEarnings();loadProfile();}
+window.refreshStatus=async function(){
+  showToast('Checking status…','info');
+  const arr=toArr((await db.ref('drivers').once('value')).val());
+  const updated=arr.find(d=>d.id===me.id);
+  if(updated){me=updated;localStorage.setItem('ecDriver',JSON.stringify(me));showStatusScreen(updated);}
+};
 
-document.querySelectorAll('.ntab[data-s],.m-tab[data-s]').forEach(function(b){b.addEventListener('click',function(){switchTab(this.dataset.s)})});
-function switchTab(s){
-  document.querySelectorAll('.ntab,.m-tab').forEach(function(x){x.classList.remove('active')});
-  document.querySelectorAll('[data-s="'+s+'"]').forEach(function(x){x.classList.add('active')});
-  document.querySelectorAll('.sec').forEach(function(x){x.classList.remove('active')});
-  $(s).classList.add('active');
-  if(s==='sEarn')loadEarnings();
-}
+window.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{const i=$('planeIntro');if(i){i.style.transition='opacity .3s';i.style.opacity='0';setTimeout(()=>i.style.display='none',300)}},2300);
+  const s=localStorage.getItem('ecDriver');
+  if(s){
+    me=JSON.parse(s);
+    // Always fetch fresh status from Firebase on load
+    setTimeout(async()=>{
+      try{
+        const arr=toArr((await db.ref('drivers').once('value')).val());
+        const fresh=arr.find(d=>d.id===me.id);
+        if(fresh){
+          // Update me with fresh data but keep session lean
+          me={...fresh,idDoc:undefined,licenceDoc:undefined};
+          const saveData={id:fresh.id,name:fresh.name,contact:fresh.contact,email:fresh.email||'',vehicle:fresh.vehicle||'',bankAccount:fresh.bankAccount||'',bankName:fresh.bankName||'',status:fresh.status||'pending',verificationStatus:fresh.verificationStatus||'pending_review',completedDeliveries:fresh.completedDeliveries||0};
+          try{localStorage.setItem('ecDriver',JSON.stringify(saveData));}catch(e){}
+          if(fresh.verificationStatus==='verified'&&fresh.status==='active'){
+            initApp();
+          } else {
+            showStatusScreen(fresh);
+          }
+        } else {
+          if(me.verificationStatus==='verified'&&me.status==='active') initApp();
+          else showStatusScreen(me);
+        }
+      }catch(e){
+        if(me.verificationStatus==='verified'&&me.status==='active') initApp();
+        else showStatusScreen(me);
+      }
+    },100);
+  } else {
+    setTimeout(()=>$('authScreen').classList.add('show'),500);
+  }
+});
 
-function loadHomeStats(){
-  var mine=allD.filter(function(d){return d.assignedDriverId===me.id;});
-  var done=mine.filter(function(d){return d.status==='Delivered';}).length;
-  var active=mine.filter(function(d){return d.driverStatus==='accepted'&&d.status!=='Delivered';}).length;
-  var earned=mine.filter(function(d){return d.status==='Delivered';}).reduce(function(s,d){return s+(d.driverAmount||0);},0);
-  var open=allD.filter(function(d){return d.driverStatus==='open'&&d.paymentStatus==='paid'&&!(d.passedBy||[]).includes(me.id);}).length;
-  $('homeStats').innerHTML='<div class="sc"><div class="si g"><i class="fas fa-check-circle"></i></div><div><div class="sv">'+done+'</div><div class="sl">DONE</div></div></div><div class="sc"><div class="si a"><i class="fas fa-truck-fast"></i></div><div><div class="sv">'+active+'</div><div class="sl">ACTIVE</div></div></div><div class="sc"><div class="si c"><i class="fas fa-bell"></i></div><div><div class="sv">'+open+'</div><div class="sl">OPEN</div></div></div><div class="sc"><div class="si r"><i class="fas fa-coins"></i></div><div><div class="sv">'+earned.toFixed(0)+'</div><div class="sl">MVR</div></div></div>';
-  $('drvInfoGrid').innerHTML='<div class="i-cell"><div class="il">Name</div><div class="iv">'+me.name+'</div></div><div class="i-cell"><div class="il">Contact</div><div class="iv">'+me.contact+'</div></div><div class="i-cell"><div class="il">Vehicle</div><div class="iv">'+(me.vehicle||'--')+'</div></div><div class="i-cell"><div class="il">Rate</div><div class="iv">MVR '+(me.defaultAmount||0)+'</div></div>';
-}
+/* ── AUTH ── */
+$('tLogin').onclick=()=>{$('tLogin').classList.add('active');$('tReg').classList.remove('active');$('pLogin').classList.add('active');$('pReg').classList.remove('active')};
+$('tReg').onclick=()=>{$('tReg').classList.add('active');$('tLogin').classList.remove('active');$('pReg').classList.add('active');$('pLogin').classList.remove('active')};
 
-function loadActiveJob(){
-  var active=allD.filter(function(d){return d.assignedDriverId===me.id&&d.driverStatus==='accepted'&&d.status!=='Delivered';});
-  var w=$('activeJobWrap');
-  if(!active.length){w.style.display='none';return}
-  w.style.display='block';
-  $('activeJobCard').innerHTML=active.map(function(d){return buildCard(d,true,false);}).join('');
-}
+// File upload previews
+['id','lic','reg','vehPhoto'].forEach(key=>{
+  const input=$(key+'Upload');const zone=$(key+'UploadZone');const lbl=$(key+'UploadLbl');
+  if(input){input.addEventListener('change',function(){if(this.files[0]){zone.classList.add('has-file');lbl.textContent='✓ '+this.files[0].name;}});}
+});
 
-function loadAvailableJobs(){
-  var open=allD.filter(function(d){return d.driverStatus==='open'&&d.paymentStatus==='paid'&&!(d.passedBy||[]).includes(me.id);});
-  var el=$('jobsList');
-  if(!open.length){el.innerHTML='<div class="empty-s"><i class="fas fa-truck-fast"></i><p>No available deliveries right now</p></div>';return}
-  el.innerHTML=open.map(function(d){return buildCard(d,false,true);}).join('');
-}
-
-function loadMyJobs(){
-  var mine=allD.filter(function(d){return d.assignedDriverId===me.id;}).sort(function(a,b){return new Date(b.driverAssignTime||b.createdAt)-new Date(a.driverAssignTime||a.createdAt);});
-  var el=$('myJobsList');
-  if(!mine.length){el.innerHTML='<div class="empty-s"><i class="fas fa-inbox"></i><p>No deliveries assigned yet</p></div>';return}
-  el.innerHTML=mine.map(function(d){return buildCard(d,d.driverStatus==='accepted'&&d.status!=='Delivered',false);}).join('');
-}
-
-function loadEarnings(){
-  var done=allD.filter(function(x){return x.assignedDriverId===me.id&&x.status==='Delivered';});
-  var total=done.reduce(function(s,x){return s+(x.driverAmount||0);},0);
-  var today=new Date().toISOString().split('T')[0];
-  var todayE=done.filter(function(x){return(x.completedAt||'').startsWith(today);}).reduce(function(s,x){return s+(x.driverAmount||0);},0);
-  var pending=done.filter(function(x){return!x.driverPaid;}).reduce(function(s,x){return s+(x.driverAmount||0);},0);
-  var paid=done.filter(function(x){return x.driverPaid;}).reduce(function(s,x){return s+(x.driverAmount||0);},0);
-  $('earnStats').innerHTML=
-    '<div class="sc"><div class="si g"><i class="fas fa-coins"></i></div><div><div class="sv">'+total.toFixed(0)+'</div><div class="sl">TOTAL</div></div></div>'
-   +'<div class="sc"><div class="si a"><i class="fas fa-sun"></i></div><div><div class="sv">'+todayE.toFixed(0)+'</div><div class="sl">TODAY</div></div></div>'
-   +'<div class="sc"><div class="si c"><i class="fas fa-hourglass-half"></i></div><div><div class="sv">'+pending.toFixed(0)+'</div><div class="sl">PENDING</div></div></div>'
-   +'<div class="sc"><div class="si r"><i class="fas fa-check-circle"></i></div><div><div class="sv">'+paid.toFixed(0)+'</div><div class="sl">PAID</div></div></div>';
-  // Bank
-  var bk=me.bank||{};
-  $('bankDetails').innerHTML=bk.bankName
-    ?'<div class="brow"><span class="bk">Bank</span><span class="bv">'+bk.bankName+'</span></div>'
-     +'<div class="brow"><span class="bk">Account Name</span><span class="bv">'+(bk.accountName||'--')+'</span></div>'
-     +'<div class="brow"><span class="bk">Account No.</span><span class="bv" style="font-family:monospace">'+(bk.accountNumber||'--')+'</span></div>'
-    :'<div class="empty-s" style="padding:.7rem"><p>No bank details. Add in Profile.</p></div>';
-  // Payment slips — fetch fresh from Firebase every time
-  db.ref('drivers/').once('value').then(function(snap){
-    var all=toArr(snap.val());
-    var fresh=all.find(function(x){return x.id===me.id;});
-    var slips=(fresh&&fresh.paySlips)||[];
-    var psw=$('paySlipsWrap');if(!psw)return;
-    if(!slips.length){
-      psw.innerHTML='<div style="font-size:.73rem;color:rgba(255,255,255,.28);padding:.3rem 0;line-height:1.5"><i class="fas fa-clock" style="margin-right:4px;opacity:.4"></i>No payment slips yet — admin will upload here after paying you.</div>';
+$('loginBtn').onclick=async()=>{
+  const contact=$('lContact').value.trim(),pwd=$('lPwd').value;
+  // Clear any corrupted localStorage first
+  try{localStorage.removeItem('ecDriver');}catch(e){}
+  if(!contact||!pwd){showMsg('loginMsg','Fill all fields','err');return;}
+  $('loginBtn').disabled=true;$('loginBtn').innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Signing in…';
+  try{
+    let arr=[];
+    try{
+      const snap=await db.ref('drivers').once('value');
+      arr=toArr(snap.val());
+    }catch(dbErr){
+      showMsg('loginMsg','Connection error: '+dbErr.message+'. Check internet.','err');
       return;
     }
-    // Build slip cards
-    var html='<div style="border-top:1px solid #253241;padding-top:.75rem">'
-      +'<div style="font-size:.72rem;font-weight:700;color:#27ae60;display:flex;align-items:center;gap:5px;margin-bottom:.65rem"><i class="fas fa-receipt"></i> Payment Slips from Admin</div>'
-      +'<div style="display:flex;flex-wrap:wrap;gap:9px">';
-    slips.forEach(function(p,i){
-      html+='<div class="slip-card-drv" onclick="showPaySlip('+i+')" '
-           +'style="cursor:pointer;background:#0e1f12;border:2px solid rgba(39,174,96,.35);border-radius:13px;overflow:hidden;width:calc(50% - 5px);min-width:130px">'
-        +'<img src="'+p.slip+'" style="width:100%;height:90px;object-fit:cover;display:block">'
-        +'<div style="padding:.5rem .6rem">'
-          +'<div style="font-size:.9rem;font-weight:900;color:#27ae60">MVR '+p.amount+'</div>'
-          +(p.note?'<div style="font-size:.7rem;color:rgba(255,255,255,.45);margin-top:1px">'+p.note+'</div>':'')
-          +'<div style="font-size:.6rem;color:rgba(255,255,255,.28);margin-top:2px">'+fmtD(p.date)+'</div>'
-        +'</div></div>';
+    if(!arr.length){showMsg('loginMsg','No drivers registered yet. Please register first.','err');return;}
+    // Normalize contact - strip leading +960 or 960
+    const normContact=contact.replace(/^\+?960/,'').replace(/[^0-9]/g,'');
+    const f=arr.find(x=>{
+      const sc=(x.contact||'').replace(/^\+?960/,'').replace(/[^0-9]/g,'');
+      return (sc===normContact||x.contact===contact)&&x.password===pwd;
     });
-    html+='</div></div>';
-    psw.innerHTML=html;
-    // Store for viewer
-    window._mySlips=slips;
+    if(!f){
+      // Show all stored contacts for debugging
+      showMsg('loginMsg','Invalid contact or password. Please check and try again.','err');
+      return;
+    }
+    if(f.status==='suspended'){showMsg('loginMsg','Account suspended. Contact EasyCargo.','err');return;}
+    me=f;
+    // Save only essential fields to localStorage (not photos — too large)
+    const saveData={id:f.id,name:f.name,contact:f.contact,email:f.email||'',vehicle:f.vehicle||'',bankAccount:f.bankAccount||'',bankName:f.bankName||'',status:f.status||'pending',verificationStatus:f.verificationStatus||'pending_review',completedDeliveries:f.completedDeliveries||0,registeredAt:f.registeredAt||''};
+    try{localStorage.setItem('ecDriver',JSON.stringify(saveData));}catch(e){console.warn('localStorage full, session only');}
+    $('authScreen').style.display='none';
+    $('authScreen').classList.remove('show');
+    showStatusScreen(f);
+  }catch(e){
+    showMsg('loginMsg','Error: '+e.message,'err');
+  }finally{$('loginBtn').disabled=false;$('loginBtn').innerHTML='<i class="fas fa-sign-in-alt"></i> Sign In';}
+};
+
+$('regBtn').onclick=async()=>{
+  const name=$('rName').value.trim(),contact=$('rContact').value.trim().replace(/^\+?960/,'').replace(/[^0-9]/g,''),pwd=$('rPwd').value,cfm=$('rCfm').value;
+  const vehicle=$('rVehicle').value,account=$('rAccount').value.trim(),bank=$('rBank').value;
+  const idFile=$('idUpload').files[0],licFile=$('licUpload').files[0];
+  if(!name||!contact||!pwd||!cfm){showMsg('regMsg','Fill all required fields','err');return;}
+  if(pwd!==cfm){showMsg('regMsg','Passwords do not match','err');return;}
+  if(!vehicle){showMsg('regMsg','Select a vehicle type','err');return;}
+  if(!account||!bank){showMsg('regMsg','Enter bank account details','err');return;}
+  if(!idFile){showMsg('regMsg','Upload your ID / Passport photo','err');return;}
+  if(!licFile){showMsg('regMsg','Upload your Driver\'s Licence','err');return;}
+  const regFile=$('regUpload')?.files[0];
+  if(!regFile){showMsg('regMsg','Upload your Vehicle Registry document','err');return;}
+  $('regBtn').disabled=true;$('regBtn').innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Registering…';
+  try{
+    const existing=toArr((await db.ref('drivers').once('value')).val());
+    if(existing.find(x=>x.contact===contact)){showMsg('regMsg','Contact number already registered','err');return;}
+    // Convert docs to base64
+    const toB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f);});
+    const regFile2=$('regUpload')?.files[0];
+    const [idB64,licB64,regB64]=await Promise.all([toB64(idFile),toB64(licFile),regFile2?toB64(regFile2):Promise.resolve('')]);
+    const vehicleNum=($('rVehicleNum')?.value||'').trim();
+    const vehPhotoFile=$('vehPhotoUpload')?.files[0];
+    const vehPhotoB64=vehPhotoFile?await toB64(vehPhotoFile):'';
+    const newDriver={id:Date.now(),name,contact,email:$('rEmail').value.trim()||'',password:pwd,vehicle,vehicleNumber:vehicleNum,vehiclePhoto:vehPhotoB64,bankAccount:account,bankName:bank,idDoc:idB64,licenceDoc:licB64,vehicleRegDoc:regB64||'',status:'pending',verificationStatus:'pending_review',registeredAt:new Date().toISOString(),earnings:0,completedDeliveries:0};
+    existing.push(newDriver);
+    await db.ref('drivers').set(existing);
+    // Notify admins via Telegram
+    const msg=`🚗 NEW DRIVER REGISTRATION\nName: ${name}\nContact: ${contact}\nVehicle: ${vehicle}\nBank: ${bank} — ${account}\nStatus: Pending Verification`;
+    TCIDS.forEach(cid=>fetch(`https://api.telegram.org/bot${TBOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:cid,text:msg})}).catch(()=>{}));
+    showMsg('regMsg','Registration submitted! Admin will verify your documents within 24 hours. ✅','ok');
+    $('tLogin').click();
+  }catch(e){showMsg('regMsg','Registration failed: '+e.message,'err');}
+  finally{$('regBtn').disabled=false;$('regBtn').innerHTML='<i class="fas fa-user-plus"></i> Register as Driver';}
+};
+
+/* ── INIT APP ── */
+function initApp(){
+  $('authScreen').classList.remove('show');
+  $('driverApp').style.display='block';
+  $('drvName').textContent=me.name||'Driver';
+  // Firebase listeners
+  db.ref('cargoDeliveries').on('value',snap=>{allOrders=toArr(snap.val());renderAvailableOrders();renderMyDeliveries();renderEarnings();});
+  db.ref('driverPayments').on('value',snap=>{allDriverPayments=toArr(snap.val()).filter(p=>p.driverId===me.id);renderEarnings();});
+  db.ref('driverNotifications/'+me.id).on('value',snap=>{allNotifs=toArr(snap.val());renderNotifs();updateNotifDot();});
+  db.ref('driverSettings').on('value',snap=>{driverSettings=snap.val()||{ratePerDelivery:50};});
+  // Refresh me from DB in case admin updated status
+  db.ref('drivers').once('value').then(snap=>{const drivers=toArr(snap.val());const updated=drivers.find(d=>d.id===me.id);if(updated){me=updated;localStorage.setItem('ecDriver',JSON.stringify(me));renderProfile();}});
+  renderProfile();renderDocUploads();
+  // Nav
+  document.querySelectorAll('.m-tab[data-s]').forEach(b=>b.addEventListener('click',function(){switchTab(this.dataset.s);}));
+}
+
+/* ── NAVIGATION ── */
+function switchTab(s){
+  document.querySelectorAll('.m-tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll(`[data-s="${s}"]`).forEach(x=>x.classList.add('active'));
+  document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));
+  $(s)?.classList.add('active');
+  if(s==='sNotif'){markNotifsRead();}
+}
+
+/* ── AVAILABLE ORDERS ── */
+function renderAvailableOrders(){
+  const el=$('availableOrdersList');if(!el)return;
+  // Show all paid orders not yet taken by any driver (any status except Delivered)
+  // Also show orders specifically assigned to THIS driver in available (so they can accept)
+  const available=allOrders.filter(o=>{
+    if(o.status==='Delivered')return false;
+    if(o.paymentStatus!=='paid')return false;
+    // If assigned to this driver → show in Mine tab not here
+    if(String(o.assignedDriverId)===String(me.id))return false;
+    // If assigned to another driver → not available
+    if(o.assignedDriverId)return false;
+    // Show all unassigned paid orders regardless of status
+    return true;
   });
-  // History list
-  var el=$('earnList');
-  if(!done.length){el.innerHTML='<div class="empty-s"><i class="fas fa-coins"></i><p>No completed deliveries yet</p></div>';return}
-  el.innerHTML=done.sort(function(a,b){return new Date(b.completedAt)-new Date(a.completedAt);}).map(function(x){
-    return'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
-      +'<div><div style="font-family:monospace;font-size:.68rem;color:#f39c12">'+x.referenceNumber+'</div>'
-      +'<div style="font-size:.7rem;color:rgba(255,255,255,.45)">'+(x.pickupLocation||'')+' → '+(x.deliveryLocation||'')+'</div>'
-      +'<div style="font-size:.6rem;color:rgba(255,255,255,.28)">'+fmtD(x.completedAt)+'</div></div>'
-      +'<div style="text-align:right">'
-        +'<div style="font-size:1rem;font-weight:800;color:#27ae60">MVR '+(x.driverAmount||0)+'</div>'
-        +'<div style="font-size:.62rem;margin-top:2px">'
-          +(x.driverPaid?'<span style="color:#27ae60"><i class="fas fa-check-circle"></i> Paid</span>'
-                        :'<span style="color:#f39c12"><i class="fas fa-hourglass-half"></i> Pending</span>')
-        +'</div></div>'
-      +'</div>';
+  if(me.status!=='active'||me.verificationStatus!=='verified'){
+    el.innerHTML=`<div class="card" style="text-align:center;padding:1.5rem">
+      <i class="fas fa-hourglass-half" style="font-size:2rem;color:#f39c12;margin-bottom:.75rem;display:block"></i>
+      <div style="font-weight:700;color:white;margin-bottom:.4rem">Account Pending Verification</div>
+      <div style="font-size:.74rem;color:rgba(255,255,255,.4);line-height:1.6">Your documents are being reviewed by EasyCargo admin. You'll be notified within 24 hours once verified.</div>
+    </div>`;
+    return;
+  }
+  // Check if driver has active delivery
+  const myActive=allOrders.filter(o=>String(o.assignedDriverId)===String(me.id)&&o.status!=='Delivered');
+  if(myActive.length>0){
+    el.innerHTML=`<div style="background:rgba(243,156,18,.07);border:1.5px solid rgba(243,156,18,.25);border-radius:16px;padding:1.2rem;text-align:center">
+      <i class="fas fa-truck-fast" style="font-size:2rem;color:#f39c12;display:block;margin-bottom:.6rem"></i>
+      <div style="font-weight:700;color:#f39c12;font-size:.9rem;margin-bottom:.3rem">You have an active delivery</div>
+      <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-bottom:.85rem;line-height:1.6">Complete your current order before taking a new one.</div>
+      <button onclick="switchTab('sMine')" style="background:#f39c12;color:#1e2a3a;border:none;border-radius:22px;padding:10px 22px;font-weight:700;cursor:pointer;font-size:.82rem;font-family:inherit"><i class="fas fa-route" style="margin-right:6px"></i>Go to My Deliveries</button>
+    </div>`;
+    return;
+  }
+  if(!available.length){
+    el.innerHTML='<div class="empty-s"><i class="fas fa-box-open"></i><p>No available orders right now.<br>Check back soon!</p></div>';
+    return;
+  }
+  const rate=driverSettings.ratePerDelivery||50;
+  el.innerHTML=available.map(o=>{
+    const isAir=o.isAir||o.deliveryMode==='air';
+    const pickup=isAir?'Male (Air)':o.pickupLocation||'—';
+    const delivery=isAir?o.airDestination||'—':o.deliveryLocation||'—';
+        const deadlineHtml=buildDeadlineHtml(o,'available');
+    const isExpress=o.isExpress||(o.cargoType||'').toLowerCase().includes('express');
+    const cargoClass=isAir?'cargo-air':isExpress?'cargo-express':'cargo-normal';
+    const cargoIcon=isAir?'fa-plane':isExpress?'fa-motorcycle':'fa-motorcycle';
+    const cargoColor=isAir?'#f39c12':isExpress?'#e74c3c':'#27ae60';
+    const cargoLabel=isAir?'Air Cargo':isExpress?'Express Cargo':'Normal Cargo';
+    return`<div class="order-card available new-order ${cargoClass}" id="oc_${o.id}">
+      <!-- Cargo type header with animated icon -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="cargo-icon-wrap">
+            <i class="fas ${cargoIcon}"></i>
+          </div>
+          <div>
+            <div style="font-weight:800;color:white;font-size:.92rem">${o.cargoType||cargoLabel}</div>
+            ${o.selectedHrLabel?`<div style="font-size:.7rem;color:#3498db;font-weight:700;margin-top:2px"><i class="fas fa-clock" style="margin-right:3px"></i>${o.selectedHrLabel}</div>`:''}
+            <div style="font-size:.6rem;color:rgba(255,255,255,.3);font-family:monospace;margin-top:1px">${o.referenceNumber}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:900;color:#27ae60;font-size:.95rem;font-family:monospace">MVR ${rate}</div>
+          <div style="font-size:.56rem;color:rgba(39,174,96,.55);font-family:monospace;text-transform:uppercase;letter-spacing:.5px">Your Earn</div>
+        </div>
+      </div>
+      <!-- Route -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.2);border-radius:10px;padding:5px 10px;flex:1;min-width:0">
+          <i class="fas fa-map-marker-alt" style="color:#e74c3c;font-size:.72rem;flex-shrink:0"></i>
+          <div><div style="font-size:.55rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px">Pickup</div><div style="font-size:.74rem;font-weight:700;color:white">${pickup}</div></div>
+        </div>
+        <i class="fas fa-arrow-right" style="color:rgba(255,255,255,.2);flex-shrink:0"></i>
+        <div style="display:flex;align-items:center;gap:5px;background:rgba(52,152,219,.08);border:1px solid rgba(52,152,219,.2);border-radius:10px;padding:5px 10px;flex:1;min-width:0">
+          <i class="fas fa-flag-checkered" style="color:#3498db;font-size:.72rem;flex-shrink:0"></i>
+          <div><div style="font-size:.55rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px">Deliver To</div><div style="font-size:.74rem;font-weight:700;color:white">${delivery}</div>
+            ${o.floorLevel?`<div style="display:inline-flex;align-items:center;gap:5px;margin-top:3px;background:rgba(243,156,18,.12);border:1px solid rgba(243,156,18,.3);border-radius:8px;padding:2px 8px"><i class="fas fa-${o.floorLevel.toLowerCase().includes('lift')?'elevator':o.floorLevel.toLowerCase().includes('ground')?'door-open':'stairs'}" style="color:#f39c12;font-size:.65rem"></i><span style="font-size:.68rem;font-weight:700;color:#f39c12">${o.floorLevel}</span></div>`:''}
+          </div></div>
+        </div>
+      </div>
+      <!-- Deadline timer -->
+      ${deadlineHtml}
+      <!-- Meta chips -->
+      <!-- Full order details -->
+      <div style="background:rgba(0,0,0,.2);border-radius:12px;padding:.65rem .8rem;margin-bottom:.55rem;display:flex;flex-direction:column;gap:5px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <i class="fas fa-user" style="color:#f39c12;font-size:.72rem;width:14px;text-align:center"></i>
+          <div style="flex:1"><span style="font-size:.6rem;color:rgba(255,255,255,.35);font-family:monospace">CUSTOMER</span> <span style="font-size:.76rem;font-weight:600;color:white">${o.customerName||'—'}</span></div>
+          <a href="tel:+960${(o.customerContact||'').replace(/[^0-9]/g,'')}" style="display:flex;align-items:center;gap:5px;background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);border-radius:20px;padding:5px 11px;text-decoration:none;color:#27ae60;font-size:.72rem;font-weight:700;flex-shrink:0"><i class="fas fa-phone" style="font-size:.7rem"></i>+960${o.customerContact||'—'}</a>
+        </div>
+        ${o.pickupAddress||o.pickupPostal?`<div style="display:flex;align-items:flex-start;gap:8px">
+          <i class="fas fa-map-marker-alt" style="color:#e74c3c;font-size:.72rem;width:14px;text-align:center;margin-top:2px"></i>
+          <div><span style="font-size:.6rem;color:rgba(255,255,255,.35);font-family:monospace">PICKUP DETAILS</span><div style="font-size:.72rem;color:rgba(255,255,255,.7);line-height:1.4">${o.pickupAddress||''} ${o.pickupPostal?'· Post: '+o.pickupPostal:''}</div></div>
+        </div>`:''}
+        <div style="display:flex;align-items:flex-start;gap:8px">
+          <i class="fas fa-flag-checkered" style="color:#3498db;font-size:.72rem;width:14px;text-align:center;margin-top:2px"></i>
+          <div><span style="font-size:.6rem;color:rgba(255,255,255,.35);font-family:monospace">${isAir?'CARGO TERMINAL / DELIVERY':'DELIVERY ADDRESS'}</span>
+            <div style="font-size:.76rem;font-weight:600;color:white;line-height:1.5">${o.deliveryAddress||o.deliveryLocation||o.airDestination||'—'}</div>
+            ${(o.deliveryPostal||o.deliveryLocation)?`<div style="font-size:.66rem;color:rgba(255,255,255,.45)">${o.deliveryLocation&&o.deliveryLocation!==o.deliveryAddress?o.deliveryLocation:''}${o.deliveryPostal?' · Postal: '+o.deliveryPostal:''}</div>`:''}
+            ${o.floorLevel?`<div style="display:inline-flex;align-items:center;gap:5px;margin-top:4px;background:rgba(243,156,18,.12);border:1px solid rgba(243,156,18,.3);border-radius:8px;padding:3px 9px">
+              <i class="fas fa-${o.floorLevel.toLowerCase().includes('lift')?'elevator':o.floorLevel.toLowerCase().includes('ground')?'door-open':'stairs'}" style="color:#f39c12;font-size:.7rem"></i>
+              <span style="font-size:.72rem;font-weight:700;color:#f39c12">${o.floorLevel}</span>
+            </div>`:''}
+          </div>
+        </div>
+        ${(o.boatName||o.speedBoatName)?`<div style="display:flex;align-items:center;gap:8px">
+          <i class="fas fa-ship" style="color:#1abc9c;font-size:.72rem;width:14px;text-align:center"></i>
+          <div><span style="font-size:.6rem;color:rgba(255,255,255,.35);font-family:monospace">BOAT</span> <span style="font-size:.72rem;color:rgba(255,255,255,.7)">${o.boatName||o.speedBoatName||'—'} ${o.boatRoute?'· '+o.boatRoute:''}</span></div>
+        </div>`:''}
+        ${o.floorLevel&&o.floorLevel!=='Ground Floor'?`<div style="display:flex;align-items:center;gap:8px">
+          <i class="fas fa-${o.floorLevel.toLowerCase().includes('lift')?'elevator':'stairs'}" style="color:#f39c12;font-size:.72rem;width:14px;text-align:center"></i>
+          <div><span style="font-size:.6rem;color:rgba(255,255,255,.35);font-family:monospace">FLOOR / LIFT</span> <span style="font-size:.76rem;font-weight:700;color:#f39c12">${o.floorLevel}</span></div>
+        </div>`:''}
+        ${o.packageDescription?`<div style="display:flex;align-items:flex-start;gap:8px">
+          <i class="fas fa-box" style="color:#9b59b6;font-size:.72rem;width:14px;text-align:center;margin-top:2px"></i>
+          <div><span style="font-size:.6rem;color:rgba(255,255,255,.35);font-family:monospace">CONTENTS</span><div style="font-size:.72rem;color:rgba(255,255,255,.6)">${o.packageDescription}</div></div>
+        </div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:.55rem;flex-wrap:wrap">
+        <span class="oc-chip oc-chip-price">MVR ${o.deliveryPrice}</span>
+        <span class="oc-chip oc-chip-date"><i class="fas fa-calendar" style="margin-right:3px"></i>${fmtD(o.deliveryDate)}</span>
+        ${o.deliveryTime?`<span class="oc-chip" style="background:rgba(231,76,60,.1);color:#e74c3c;border:1px solid rgba(231,76,60,.2)"><i class="fas fa-clock" style="margin-right:3px"></i>By ${o.deliveryTime}</span>`:''}
+        ${o.selectedHrLabel?`<span class="oc-chip" style="background:rgba(52,152,219,.12);color:#3498db;border:1.5px solid rgba(52,152,219,.3);font-weight:700;font-size:.72rem"><i class="fas fa-clock" style="margin-right:4px"></i>${o.selectedHrLabel}</span>`:''}
+        ${o.expressTime||o.selectedExpressHours?`<span class="oc-chip" style="background:rgba(52,152,219,.1);color:#3498db;border:1px solid rgba(52,152,219,.2)"><i class="fas fa-bolt" style="margin-right:3px"></i>${o.expressTime||o.selectedExpressHours+' hrs'}</span>`:''}
+        ${o.deliveryDuration&&!o.isExpress?`<span class="oc-chip" style="background:rgba(39,174,96,.1);color:#27ae60;border:1px solid rgba(39,174,96,.2)"><i class="fas fa-calendar-check" style="margin-right:3px"></i>${o.deliveryDuration}</span>`:''}
+      </div>
+      <button class="btn-take" onclick="takeOrder('${o.id}','${o.referenceNumber}')">
+        <i class="fas fa-hand-pointer"></i> Take This Order
+      </button>
+    </div>`}).join('');
+}
+
+/* ── TAKE ORDER ── */
+window.takeOrder=async function(orderId,ref){
+  const order=allOrders.find(o=>String(o.id)===String(orderId));
+  if(!order){showToast('Order not found','err');return;}
+  if(order.assignedDriverId){showToast('This order was just taken by another driver!','err');return;}
+  // Block if driver already has an active (incomplete) delivery
+  const myActive=allOrders.filter(o=>String(o.assignedDriverId)===String(me.id)&&o.status!=='Delivered');
+  if(myActive.length>0){
+    showToast('Complete your current delivery first before taking a new order!','err');
+    // Flash the Mine tab
+    document.querySelector('[data-s="sMine"]')?.classList.add('active');
+    setTimeout(()=>switchTab('sMine'),600);
+    return;
+  }
+  if(!confirm(`Take order ${ref}?\nYou'll be responsible for this delivery.`))return;
+  // Animate card out
+  const card=document.getElementById('oc_'+orderId);
+  if(card)card.classList.add('taking-order');
+  order.assignedDriverId=me.id;
+  order.assignedDriverName=me.name;
+  order.assignedDriverContact=me.contact;
+  order.assignedAt=new Date().toISOString();
+  order.status='Processing';
+  order.progress=2;
+  order.takenAt=new Date().toISOString();
+  await db.ref('cargoDeliveries').set(allOrders);
+  // Notify admin
+  const msg=`🚗 ORDER TAKEN\nRef: ${ref}\nDriver: ${me.name} (+960${me.contact})\nVehicle: ${me.vehicle||'—'}\nRoute: ${order.pickupLocation||'Air'} → ${order.deliveryLocation||order.airDestination||'—'}`;
+  TCIDS.forEach(cid=>fetch(`https://api.telegram.org/bot${TBOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:cid,text:msg})}).catch(()=>{}));
+  // Notify customer via Firebase notification
+  const n={id:Date.now(),title:'🚗 Driver Assigned!',message:`${me.name} will deliver your order ${ref}. Contact: +960${me.contact}`,userEmail:order.createdBy,timestamp:new Date().toISOString(),read:false};
+  const notifs=toArr((await db.ref('notifications').once('value')).val());
+  notifs.push(n);
+  await db.ref('notifications').set(notifs);
+  showToast('Order taken! ✅','ok');
+  switchTab('sMine');
+};
+
+/* ── MY DELIVERIES ── */
+function renderMyDeliveries(){
+  const el=$('myDeliveriesList');if(!el)return;
+  const mine=allOrders.filter(o=>String(o.assignedDriverId)===String(me.id));
+  const active=mine.filter(o=>o.status!=='Delivered');
+  const done=mine.filter(o=>o.status==='Delivered');
+  if($('statActive'))$('statActive').textContent=active.length;
+  if($('statDone'))$('statDone').textContent=done.length;
+  setTimeout(startLiveTimers,100);
+  if(!mine.length){el.innerHTML='<div class="empty-s"><i class="fas fa-route"></i><p>No deliveries yet.<br>Go take an order!</p></div>';return;}
+  const rate=driverSettings.ratePerDelivery||50;
+  el.innerHTML=[...active,...done].map(o=>{
+    const isDone=o.status==='Delivered';
+    const isAir=o.isAir||o.deliveryMode==='air';
+    const pickup=isAir?'Male (Air)':o.pickupLocation||'—';
+    const delivery=isAir?o.airDestination||'—':o.deliveryLocation||'—';
+    const statusColor=isDone?'#27ae60':'#f39c12';
+    const timerHtml=!isDone?buildDeadlineHtml(o,'mine'):'';
+    const isExpress=o.isExpress||(o.cargoType||'').toLowerCase().includes('express');
+    const mCargoClass=isAir?'cargo-air':isExpress?'cargo-express':'cargo-normal';
+    const mCargoIcon=isAir?'fa-plane':isExpress?'fa-motorcycle':'fa-motorcycle';
+    return`<div class="order-card ${isDone?'completed':'mine'} ${isDone?'':mCargoClass}">
+      <!-- Cargo name header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="cargo-icon-wrap" style="${isDone?'opacity:.5':''}">
+            <i class="fas ${mCargoIcon}"></i>
+          </div>
+          <div>
+            <div style="font-weight:800;color:white;font-size:.86rem">${o.cargoType||'General Cargo'}</div>
+            <div style="font-size:.6rem;color:rgba(255,255,255,.3);font-family:monospace">${o.referenceNumber}</div>
+          </div>
+        </div>
+        <span class="badge" style="background:${statusColor}22;color:${statusColor};border:1px solid ${statusColor}44">${o.status}</span>
+      </div>
+      <!-- Route -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:.45rem;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;background:rgba(243,156,18,.06);border:1px solid rgba(243,156,18,.15);border-radius:10px;padding:5px 10px;flex:1;min-width:0">
+          <i class="fas fa-map-marker-alt" style="color:#e74c3c;font-size:.72rem;flex-shrink:0"></i>
+          <div><div style="font-size:.55rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px">Pickup From</div><div style="font-size:.74rem;font-weight:700;color:white">${pickup}</div></div>
+        </div>
+        <i class="fas fa-arrow-right" style="color:rgba(255,255,255,.2);flex-shrink:0"></i>
+        <div style="display:flex;align-items:center;gap:5px;background:rgba(52,152,219,.06);border:1px solid rgba(52,152,219,.15);border-radius:10px;padding:5px 10px;flex:1;min-width:0">
+          <i class="fas fa-flag-checkered" style="color:#3498db;font-size:.72rem;flex-shrink:0"></i>
+          <div><div style="font-size:.55rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px">Deliver To</div><div style="font-size:.74rem;font-weight:700;color:white">${delivery}</div></div>
+        </div>
+      </div>
+      ${timerHtml}
+      <div class="oc-meta">
+        <span class="oc-chip oc-chip-type">${o.cargoType||'Cargo'}</span>
+        <span class="oc-chip oc-chip-earn">Earn: MVR ${rate}</span>
+        <span class="oc-chip oc-chip-date">${fmtD(o.deliveryDate)}</span>
+      </div>
+      <div style="font-size:.7rem;color:rgba(255,255,255,.4);margin-bottom:.6rem"><i class="fas fa-user" style="margin-right:4px"></i>${o.customerName} · ${o.customerContact}</div>
+      ${o.status==='Pending Approval'?
+        `<div style="background:rgba(243,156,18,.08);border:1px solid rgba(243,156,18,.25);border-radius:12px;padding:.65rem;text-align:center">
+          <i class="fas fa-hourglass-half" style="color:#f39c12;margin-right:6px"></i>
+          <span style="font-size:.76rem;font-weight:700;color:#f39c12">Waiting Admin Approval</span>
+          <div style="font-size:.62rem;color:rgba(255,255,255,.35);margin-top:3px">Proof submitted — admin will approve delivery</div>
+        </div>`:
+        !isDone?`<div style="display:flex;gap:7px">
+          <button class="btn-complete" onclick="openComplete('${o.id}')"><i class="fas fa-pen-to-square"></i> Update Status</button>
+          <button class="btn-release" onclick="releaseOrder('${o.id}','${o.referenceNumber}')"><i class="fas fa-times"></i> Release</button>
+        </div>`:`<div style="font-size:.7rem;color:#27ae60;font-family:monospace"><i class="fas fa-check-circle" style="margin-right:4px"></i>Completed ${fmtD(o.completedAt)}</div>`}
+    </div>`}).join('');
+}
+
+/* ── COMPLETE DELIVERY ── */
+window.openComplete=function(orderId){
+  const order=allOrders.find(o=>String(o.id)===String(orderId));
+  $('completeOrderId').value=orderId;
+  $('proofUpload').value='';
+  $('proofUploadLbl').textContent='Tap to attach proof photo';
+  $('proofUploadZone').classList.remove('has-file');
+  // Set current status in dropdown
+  const currentStatus=order?.status||'Processing';
+  if($('drvStatusSel')){
+    $('drvStatusSel').value=['Processing','In Transit','Out for Delivery','Delivered'].includes(currentStatus)?currentStatus:'Processing';
+    $('drvProofBox').style.display='none';
+    $('completeConfirm').innerHTML='<i class="fas fa-check"></i> Update Status';
+  }
+  $('completeMod').classList.add('show');
+};
+$('completeClose').onclick=$('completeCancel').onclick=()=>$('completeMod').classList.remove('show');
+$('drvStatusSel').addEventListener('change',function(){
+  const isDelivered=this.value==='Delivered';
+  $('drvProofBox').style.display=isDelivered?'block':'none';
+  $('completeConfirm').innerHTML=isDelivered?'<i class="fas fa-check"></i> Submit for Approval':'<i class="fas fa-check"></i> Update Status';
+});
+$('proofUpload').addEventListener('change',function(){if(this.files[0]){$('proofUploadZone').classList.add('has-file');$('proofUploadLbl').textContent='✓ '+this.files[0].name;}});
+$('completeConfirm').onclick=async()=>{
+  const orderId=$('completeOrderId').value;
+  const selStatus=$('drvStatusSel')?.value||'Delivered';
+  const isDelivered=selStatus==='Delivered';
+  const f=$('proofUpload').files[0];
+  if(isDelivered&&!f){showToast('Upload a proof photo first','err');return;}
+  $('completeConfirm').disabled=true;
+  $('completeConfirm').innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Saving…';
+  try{
+    const order=allOrders.find(o=>String(o.id)===String(orderId));
+    if(!order){showToast('Order not found','err');return;}
+
+    if(!isDelivered){
+      // ── Non-delivered status update ──
+      const sm={'Processing':2,'In Transit':3,'Out for Delivery':4};
+      order.status=selStatus;
+      order.progress=sm[selStatus]||2;
+      await db.ref('cargoDeliveries').set(allOrders);
+      // Notify customer
+      const n={id:Date.now(),title:`🚚 Order ${selStatus}`,message:`Your delivery ${order.referenceNumber} is now: ${selStatus}.`,userEmail:order.createdBy,timestamp:new Date().toISOString(),read:false};
+      const notifs=toArr((await db.ref('notifications').once('value')).val());notifs.push(n);
+      await db.ref('notifications').set(notifs);
+      $('completeMod').classList.remove('show');
+      showToast(`Status updated: ${selStatus} ✅`,'ok');
+      return;
+    }
+
+    // ── Delivered — submit for admin approval ──
+    const rd=new FileReader();
+    rd.onload=async ev=>{
+      order.status='Pending Approval';
+      order.progress=4;
+      order.deliveryImage=ev.target.result;
+      order.driverSubmittedAt=new Date().toISOString();
+      order.submittedByDriver=me.name;
+      order.submittedByDriverId=me.id;
+      await db.ref('cargoDeliveries').set(allOrders);
+      // Notify admin
+      const rate=driverSettings.ratePerDelivery||50;
+      const msg=`📸 DELIVERY PROOF SUBMITTED — NEEDS APPROVAL\nRef: ${order.referenceNumber}\nDriver: ${me.name} (+960${me.contact})\nCustomer: ${order.customerName}\nRoute: ${order.pickupLocation||'Air'} → ${order.deliveryLocation||order.airDestination||'—'}\nEarning: MVR ${rate}\n\n⚡ Admin → All Records → Approve Delivery`;
+      TCIDS.forEach(cid=>fetch(`https://api.telegram.org/bot${TBOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:cid,text:msg})}).catch(()=>{}));
+      $('completeMod').classList.remove('show');
+      showToast('Proof submitted! Waiting admin approval ⏳','ok');
+      switchTab('sMine');
+    };
+    rd.readAsDataURL(f);
+  }catch(e){showToast('Failed: '+e.message,'err');}
+  finally{$('completeConfirm').disabled=false;$('completeConfirm').innerHTML='<i class="fas fa-check"></i> Update';}
+};
+
+
+/* ── RELEASE ORDER ── */
+window.releaseOrder=async function(orderId,ref){
+  if(!confirm(`Release order ${ref}? It will go back to available orders.`))return;
+  const order=allOrders.find(o=>String(o.id)===String(orderId));
+  if(!order)return;
+  delete order.assignedDriverId;delete order.assignedDriverName;delete order.assignedDriverContact;delete order.assignedAt;
+  order.status='Processing';order.progress=2;
+  await db.ref('cargoDeliveries').set(allOrders);
+  showToast('Order released','ok');
+};
+
+/* ── EARNINGS ── */
+function renderEarnings(){
+  const el=$('earningsList');
+  const total=allDriverPayments.reduce((s,p)=>s+(p.amount||0),0);
+  const pending=allDriverPayments.filter(p=>p.status==='pending').reduce((s,p)=>s+(p.amount||0),0);
+  const paid=allDriverPayments.filter(p=>p.status==='paid').reduce((s,p)=>s+(p.amount||0),0);
+  if($('totalEarned'))$('totalEarned').textContent='MVR '+total.toFixed(0);
+  if($('earnPending'))$('earnPending').textContent='MVR '+pending.toFixed(0);
+  if($('earnPaid'))$('earnPaid').textContent='MVR '+paid.toFixed(0);
+  if(!el)return;
+  if(!allDriverPayments.length){el.innerHTML='<div class="empty-s"><i class="fas fa-wallet"></i><p>No earnings yet.<br>Complete deliveries to earn.</p></div>';return;}
+
+  el.innerHTML=[...allDriverPayments].sort((a,b)=>new Date(b.completedAt)-new Date(a.completedAt)).map(p=>{
+    const isPending=p.status==='pending';
+    const isPaid=p.status==='paid';
+    // Calculate 24hr countdown from completedAt
+    const completedAt=new Date(p.completedAt);
+    const payDeadline=new Date(completedAt.getTime()+24*3600*1000);
+    const now=new Date();
+    const msLeft=payDeadline-now;
+    const hrsLeft=Math.floor(msLeft/3600000);
+    const minsLeft=Math.floor((msLeft%3600000)/60000);
+    const timeLabel=msLeft>0?`${hrsLeft}h ${minsLeft}m`:'Due now';
+    const isOverdue=msLeft<0;
+    const timerColor=isOverdue?'#e74c3c':msLeft<7200000?'#e74c3c':msLeft<14400000?'#f39c12':'#27ae60';
+
+    return`<div style="background:#1a2535;border-radius:16px;padding:.9rem;margin-bottom:.75rem;border:1.5px solid ${isPaid?'rgba(39,174,96,.2)':isOverdue?'rgba(231,76,60,.35)':'rgba(243,156,18,.2)'}">
+      <!-- Header row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+        <div>
+          <div style="font-family:monospace;font-size:.72rem;color:#f39c12;font-weight:700">${p.orderRef||'—'}</div>
+          <div style="font-size:.65rem;color:rgba(255,255,255,.4);margin-top:1px">${p.route||'—'}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:900;color:${isPaid?'#27ae60':'#f39c12'};font-family:monospace;font-size:1.1rem">MVR ${p.amount}</div>
+          <span style="background:${isPaid?'rgba(39,174,96,.12)':'rgba(243,156,18,.1)'};color:${isPaid?'#27ae60':'#f39c12'};border:1px solid ${isPaid?'rgba(39,174,96,.25)':'rgba(243,156,18,.25)'};font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:8px">${isPaid?'✓ Paid':'● Pending'}</span>
+        </div>
+      </div>
+      <!-- Date row -->
+      <div style="display:flex;justify-content:space-between;font-size:.65rem;color:rgba(255,255,255,.35);margin-bottom:.6rem">
+        <span>Completed: ${p.completedAt?new Date(p.completedAt).toLocaleDateString('en-US',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</span>
+        ${isPaid&&p.paidAt?`<span style="color:#27ae60">Paid: ${new Date(p.paidAt).toLocaleDateString('en-US',{day:'numeric',month:'short'})}</span>`:''}
+      </div>
+      ${isPending?`
+      <!-- 24hr payment countdown -->
+      <div style="background:rgba(0,0,0,.25);border-radius:10px;padding:.6rem .75rem;margin-bottom:.6rem;border:1px solid ${isOverdue?'rgba(231,76,60,.3)':'rgba(255,255,255,.06)'}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem">
+          <div style="font-size:.58rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px;font-family:monospace">Payment Expected Within</div>
+          <div style="font-family:monospace;font-weight:800;color:${timerColor};font-size:.78rem" id="payTimer_${p.id}">${isOverdue?'⚠️ OVERDUE':timeLabel}</div>
+        </div>
+        <div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden">
+          <div style="height:100%;border-radius:2px;background:${timerColor};width:${Math.max(0,Math.min(100,(1-(msLeft/(24*3600*1000)))*100))}%;transition:width .5s"></div>
+        </div>
+        <div style="font-size:.6rem;color:rgba(255,255,255,.25);margin-top:.3rem">24 hrs from delivery completion</div>
+      </div>
+      `:''}
+      <!-- Payment slip — eye icon to view -->
+      ${p.paymentSlip?`
+      <div style="display:flex;align-items:center;gap:8px;margin-top:.45rem;background:rgba(39,174,96,.07);border:1px solid rgba(39,174,96,.2);border-radius:10px;padding:.5rem .75rem;cursor:pointer" onclick="viewPaySlip('${p.id}')">
+        <i class="fas fa-eye" style="color:#27ae60;font-size:.85rem"></i>
+        <span style="font-size:.72rem;color:#27ae60;font-weight:600">View Payment Slip</span>
+        <i class="fas fa-chevron-right" style="color:rgba(39,174,96,.4);font-size:.65rem;margin-left:auto"></i>
+      </div>`:`<div style="font-size:.62rem;color:rgba(255,255,255,.2);margin-top:.4rem"><i class="fas fa-receipt" style="margin-right:4px;opacity:.3"></i>No payment slip yet</div>`}
+    </div>`;
+  }).join('');
+
+  // Start live payment timers
+  startPayTimers();
+}
+
+/* Payment slip full view */
+let viewingSlipUrl='';
+window.viewPaySlip=function(pid){
+  const p=allDriverPayments.find(x=>String(x.id)===String(pid));
+  if(!p?.paymentSlip)return;
+  // Open slip in modal
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  overlay.innerHTML=`<div style="max-width:100%;max-height:90vh;position:relative">
+    <img src="${p.paymentSlip}" style="max-width:100%;max-height:85vh;border-radius:12px;border:2px solid rgba(39,174,96,.4)">
+    <button onclick="this.closest('div').parentElement.remove()" style="position:absolute;top:-12px;right:-12px;width:32px;height:32px;background:#e74c3c;border:none;border-radius:50%;color:white;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+    <div style="text-align:center;margin-top:.5rem;font-size:.72rem;color:rgba(39,174,96,.8)"><i class="fas fa-receipt" style="margin-right:5px"></i>Payment Slip</div>
+  </div>`;
+  overlay.onclick=function(e){if(e.target===overlay)overlay.remove();};
+  document.body.appendChild(overlay);
+};
+
+/* Live payment countdown timers */
+let payTimerInt=null;
+function startPayTimers(){
+  if(payTimerInt)clearInterval(payTimerInt);
+  payTimerInt=setInterval(()=>{
+    allDriverPayments.filter(p=>p.status==='pending').forEach(p=>{
+      const el=document.getElementById('payTimer_'+p.id);if(!el)return;
+      const payDL=new Date(new Date(p.completedAt).getTime()+24*3600*1000);
+      const msLeft=payDL-new Date();
+      const h=Math.floor(Math.abs(msLeft)/3600000);
+      const m=Math.floor((Math.abs(msLeft)%3600000)/60000);
+      el.textContent=msLeft<0?'⚠️ OVERDUE':`${h}h ${m}m`;
+      el.style.color=msLeft<0?'#e74c3c':msLeft<7200000?'#e74c3c':msLeft<14400000?'#f39c12':'#27ae60';
+    });
+  },60000); // update every minute
+}
+
+
+/* ── NOTIFICATIONS ── */
+function renderNotifs(){
+  const el=$('notifList');if(!el)return;
+  if(!allNotifs.length){el.innerHTML='<div class="empty-s"><i class="fas fa-bell-slash"></i><p>No notifications</p></div>';return;}
+  el.innerHTML=[...allNotifs].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)).map(n=>`
+    <div class="card" style="margin-bottom:.6rem;${!n.read?'border-color:rgba(243,156,18,.3);':''}">
+      <div style="font-weight:700;color:white;font-size:.82rem;margin-bottom:.3rem">${n.title||'Notification'}</div>
+      <div style="font-size:.76rem;color:rgba(255,255,255,.55);line-height:1.5">${n.message||''}</div>
+      <div style="font-size:.62rem;color:rgba(255,255,255,.25);margin-top:.4rem;font-family:monospace">${n.timestamp?new Date(n.timestamp).toLocaleString('en-US',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</div>
+    </div>`).join('');
+}
+function updateNotifDot(){
+  const unread=allNotifs.filter(n=>!n.read).length;
+  const dot=$('notifDot');if(dot){dot.className=`n-dot ${unread?'show':''}`;if(unread)dot.textContent=unread>9?'9+':unread;}
+}
+async function markNotifsRead(){
+  if(!allNotifs.some(n=>!n.read))return;
+  allNotifs.forEach(n=>n.read=true);
+  await db.ref('driverNotifications/'+me.id).set(allNotifs);
+  updateNotifDot();
+}
+
+/* ── PROFILE ── */
+function triggerProfilePhoto(){$('profilePhotoInput').click();}
+
+window.uploadProfilePhoto=async function(input){
+  if(!input.files[0])return;
+  showToast('Uploading photo…','info');
+  const rd=new FileReader();
+  rd.onload=async ev=>{
+    const drivers=toArr((await db.ref('drivers').once('value')).val());
+    const d=drivers.find(x=>x.id===me.id);
+    if(d){d.profilePhoto=ev.target.result;await db.ref('drivers').set(drivers);me.profilePhoto=ev.target.result;localStorage.setItem('ecDriver',JSON.stringify({...JSON.parse(localStorage.getItem('ecDriver')||'{}'),profilePhoto:ev.target.result}));}
+    renderProfile();showToast('Profile photo updated ✅','ok');
+  };rd.readAsDataURL(input.files[0]);
+};
+
+/* Document uploads from profile */
+const DOCS=[
+  {key:'idDoc',label:'National ID / Passport',icon:'fa-id-card',color:'#f39c12',required:true},
+  {key:'licenceDoc',label:"Driver's Licence",icon:'fa-car',color:'#3498db',required:true},
+  {key:'vehicleRegDoc',label:'Vehicle Registry',icon:'fa-file-alt',color:'#9b59b6',required:true,hasForm:true},
+  {key:'vehiclePhoto',label:'Vehicle Photo',icon:'fa-car',color:'#3498db',required:false},
+];
+
+function renderDocUploads(){
+  const el=$('docUploadList');if(!el)return;
+  el.innerHTML=DOCS.map(doc=>{
+    const hasDoc=me[doc.key];
+    const hasMeta=doc.hasForm;
+    const regNum=me.vehicleRegNumber||'';
+    const regModel=me.vehicleModel||'';
+    if(hasMeta){
+      // Special card for Vehicle Registry — shows form fields + upload
+      return`<div style="background:#1a2535;border-radius:14px;padding:.85rem;border:1.5px solid ${hasDoc?'rgba(155,89,182,.35)':'rgba(255,255,255,.07)'}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:.7rem">
+          <div style="width:34px;height:34px;border-radius:10px;background:rgba(155,89,182,.15);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">
+            ${hasDoc?`<img src="${me.vehicleRegDoc}" style="width:34px;height:34px;object-fit:cover;border-radius:10px">`:`<i class="fas fa-file-alt" style="color:#9b59b6"></i>`}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:.76rem;font-weight:700;color:white">Vehicle Registry <span style="color:#e74c3c;font-size:.62rem">*Required</span></div>
+            <div style="font-size:.62rem;color:${hasDoc?'#27ae60':'rgba(255,255,255,.35)'}">${hasDoc?'✓ Uploaded':'Not uploaded'}</div>
+          </div>
+        </div>
+        <!-- Registry Number -->
+        <div style="margin-bottom:.5rem">
+          <label style="font-size:.65rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.25rem">Registry / Plate Number</label>
+          <input type="text" id="vehRegNumInput" value="${regNum}" placeholder="e.g. PL-1234" style="width:100%;padding:8px 12px;background:#111c2e;border:1px solid #2e3f55;border-radius:22px;color:white;font-size:.8rem;outline:none;font-family:monospace">
+        </div>
+        <!-- Model -->
+        <div style="margin-bottom:.65rem">
+          <label style="font-size:.65rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.25rem">Vehicle Model</label>
+          <input type="text" id="vehModelInput" value="${regModel}" placeholder="e.g. Honda CB150" style="width:100%;padding:8px 12px;background:#111c2e;border:1px solid #2e3f55;border-radius:22px;color:white;font-size:.82rem;outline:none;font-family:inherit">
+        </div>
+        <!-- Upload -->
+        <label style="display:flex;align-items:center;gap:6px;background:#111c2e;border:1.5px dashed rgba(155,89,182,.4);border-radius:12px;padding:.6rem .8rem;cursor:pointer;margin-bottom:.6rem">
+          <i class="fas fa-upload" style="color:#9b59b6"></i>
+          <span style="font-size:.72rem;color:rgba(255,255,255,.5)">${hasDoc?'Update registry photo':'Upload registry document / photo'}</span>
+          <input type="file" accept="image/*" style="display:none" onchange="uploadDoc('vehicleRegDoc',this)">
+        </label>
+        <button onclick="saveVehicleRegInfo()" style="width:100%;background:rgba(155,89,182,.2);border:1.5px solid rgba(155,89,182,.4);color:#9b59b6;border-radius:22px;padding:9px;font-weight:700;cursor:pointer;font-size:.78rem;font-family:inherit"><i class="fas fa-save" style="margin-right:5px"></i>Save Registry Info</button>
+      </div>`;
+    }
+    return`<div style="display:flex;align-items:center;gap:10px;background:#1a2535;border-radius:12px;padding:.7rem;border:1px solid ${hasDoc?'rgba(39,174,96,.25)':'rgba(255,255,255,.07)'}">
+      <div style="width:36px;height:36px;border-radius:10px;background:${hasDoc?'rgba(39,174,96,.15)':'rgba(255,255,255,.05)'};display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0">
+        ${hasDoc?`<img src="${me[doc.key]}" style="width:36px;height:36px;object-fit:cover;border-radius:10px">`:`<i class="fas ${doc.icon}" style="color:${doc.color}"></i>`}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.76rem;font-weight:600;color:white">${doc.label} ${doc.required?'':'<span style="font-size:.58rem;color:rgba(255,255,255,.3)">(optional)</span>'}</div>
+        <div style="font-size:.62rem;color:${hasDoc?'#27ae60':'rgba(255,255,255,.35)'}">${hasDoc?'✓ Uploaded':'Not uploaded'}</div>
+      </div>
+      <label style="background:rgba(243,156,18,.12);border:1px solid rgba(243,156,18,.25);color:#f39c12;border-radius:10px;padding:5px 11px;font-size:.68rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">
+        <i class="fas fa-upload" style="margin-right:4px"></i>${hasDoc?'Update':'Upload'}
+        <input type="file" accept="image/*" style="display:none" onchange="uploadDoc('${doc.key}',this)">
+      </label>
+    </div>`;
   }).join('');
 }
-// Show slip full screen
-window.showPaySlip=function(i){
-  var slips=window._mySlips||[];
-  if(!slips[i])return;
-  $('slipViewImg').src=slips[i].slip;
-  $('slipViewAmt').textContent='MVR '+slips[i].amount+(slips[i].note?' — '+slips[i].note:'');
-  $('slipViewDate').textContent=fmtD(slips[i].date);
-  $('slipViewMod').classList.add('show');
-};
 
-
-function loadProfile(){
-  $('profileGrid').innerHTML='<div class="i-cell"><div class="il">Name</div><div class="iv">'+me.name+'</div></div><div class="i-cell"><div class="il">Contact</div><div class="iv">'+me.contact+'</div></div><div class="i-cell"><div class="il">Vehicle</div><div class="iv">'+(me.vehicle||'--')+'</div></div><div class="i-cell"><div class="il">Status</div><div class="iv">'+(me.status==='active'?'<span style="color:#27ae60">Active</span>':'<span style="color:#f39c12">Pending</span>')+'</div></div><div class="i-cell"><div class="il">Joined</div><div class="iv">'+fmtD(me.createdAt)+'</div></div><div class="i-cell"><div class="il">Rate</div><div class="iv">MVR '+(me.defaultAmount||0)+'</div></div>';
-  var bk=me.bank||{};
-  $('profileBank').innerHTML=bk.bankName?'<div class="brow"><span class="bk">Bank</span><span class="bv">'+bk.bankName+'</span></div><div class="brow"><span class="bk">Account Name</span><span class="bv">'+(bk.accountName||'--')+'</span></div><div class="brow"><span class="bk">Account No.</span><span class="bv">'+(bk.accountNumber||'--')+'</span></div>':'<div class="empty-s" style="padding:.8rem"><p>No bank details set</p></div>';
-  $('docsList').innerHTML='<div style="display:flex;gap:8px;flex-wrap:wrap">'+(me.idPhoto?'<div style="flex:1;min-width:140px"><div style="font-size:.68rem;color:rgba(255,255,255,.4);margin-bottom:4px">National ID</div><img src="'+me.idPhoto+'" style="width:100%;border-radius:9px;border:1px solid #2e3f55;max-height:120px;object-fit:cover"></div>':'<div style="color:rgba(255,255,255,.3);font-size:.76rem">No ID uploaded</div>')+(me.vehicleRegistry?'<div style="flex:1;min-width:140px"><div style="font-size:.68rem;color:rgba(255,255,255,.4);margin-bottom:4px">Vehicle Registry</div><img src="'+me.vehicleRegistry+'" style="width:100%;border-radius:9px;border:1px solid #2e3f55;max-height:120px;object-fit:cover"></div>':'')+'</div>';
-}
-
-function buildCard(d,canUpdate,canAccept){
-  return'<div class="del-card '+(canAccept?'open-job':canUpdate?'my-job':'')+'"><div class="del-ref">'+d.referenceNumber+'</div><div class="del-cust">'+d.customerName+' <a href="tel:'+d.customerContact+'" style="font-size:.7rem;color:#f39c12;margin-left:5px"><i class="fas fa-phone"></i> '+d.customerContact+'</a></div><div class="del-route"><i class="fas fa-map-marker-alt" style="color:#f39c12;margin-right:3px"></i>'+(d.pickupLocation||'')+' &rarr; '+(d.deliveryLocation||'')+'</div>'+(d.packageDescription?'<div style="font-size:.7rem;color:rgba(255,255,255,.35);margin-bottom:5px">'+d.packageDescription+'</div>':'')+'<div class="del-amt">MVR '+(d.driverAmount||0)+'</div><div style="margin-bottom:6px">'+sBadge(d.status)+'</div><div class="del-btns">'+(canAccept?'<button class="btn-accept" onclick="acceptJob('+d.id+')"><i class="fas fa-check"></i> Accept</button>':'')+(canUpdate?'<button class="btn-upd" onclick="openStat('+d.id+')"><i class="fas fa-pen"></i> Update Status</button>':'')+(canAccept?'<button class="btn-pass" onclick="passJob('+d.id+')"><i class="fas fa-times"></i> Pass</button>':'')+'</div></div>';
-}
-
-window.acceptJob=async function(id){
-  var d=allD.find(function(x){return x.id===id;});if(!d)return;
-  if(d.driverStatus==='accepted'){showToast('Already taken by another driver','err');return}
-  d.assignedDriver=me.name;d.assignedDriverId=me.id;d.driverStatus='accepted';d.driverAcceptTime=new Date().toISOString();
-  await db.ref('cargoDeliveries').set(allD);showToast('Job accepted!','ok');switchTab('sMine');
-};
-
-window.passJob=async function(id){
-  var d=allD.find(function(x){return x.id===id;});if(!d)return;
-  if(!d.passedBy)d.passedBy=[];
-  if(!d.passedBy.includes(me.id)){d.passedBy.push(me.id);await db.ref('cargoDeliveries').set(allD);}
-  showToast('Passed','info');
-};
-
-$('statSel').addEventListener('change',function(){$('proofBox').style.display=this.value==='Delivered'?'block':'none';});
-
-window.openStat=function(id){
-  curStatId=id;var d=allD.find(function(x){return x.id===id;});if(!d)return;
-  $('statDelInfo').innerHTML='<strong style="color:white">'+d.referenceNumber+'</strong> &bull; '+d.customerName+'<br><span style="font-size:.72rem">'+(d.pickupLocation||'')+' &rarr; '+(d.deliveryLocation||'')+'</span>';
-  $('statSel').value='Processing';$('proofBox').style.display='none';
-  $('proofFile').value='';$('proofFN').textContent='Tap to take photo';$('proofLbl').className='upload-lbl';
-
-  $('statMod').classList.add('show');
-};
-$('statClose').onclick=$('statCancel').onclick=function(){$('statMod').classList.remove('show')};
-
-$('statConfirm').onclick=async function(){
-  var ns=$('statSel').value;var d=allD.find(function(x){return x.id===curStatId;});if(!d)return;
-  var sm={'Order Placed':1,'Processing':2,'In Transit':3,'Out for Delivery':4,'Delivered':5};
-  if(ns==='Delivered'){
-    var pf=$('proofFile').files[0];if(!pf){showToast('Upload delivery proof photo','err');return}
-    $('statConfirm').innerHTML='<i class="fas fa-spinner fa-spin"></i>';$('statConfirm').disabled=true;
-    var rd=new FileReader();
-    rd.onload=async function(ev){
-      d.status='Delivered';d.progress=5;d.deliveryImage=ev.target.result;
-      d.completedAt=new Date().toISOString();d.attendedBy=me.name;
-      await finishDelivery(d);
-    };rd.readAsDataURL(pf);
-  } else {
-    d.status=ns;d.progress=sm[ns]||1;d.attendedBy=me.name;
-    await db.ref('cargoDeliveries').set(allD);
-    pushAdminNotif('Status Update: '+d.referenceNumber,'Driver '+me.name+' updated status to "'+ns+'" for '+d.customerName+' ('+d.pickupLocation+'->'+d.deliveryLocation+')');
-    $('statMod').classList.remove('show');showToast('Status updated','ok');
+window.saveVehicleRegInfo=async function(){
+  const regNum=($('vehRegNumInput')?.value||'').trim();
+  const model=($('vehModelInput')?.value||'').trim();
+  if(!regNum&&!model){showToast('Enter registry number or model','err');return;}
+  const drivers=toArr((await db.ref('drivers').once('value')).val());
+  const d=drivers.find(x=>x.id===me.id);
+  if(d){
+    if(regNum)d.vehicleRegNumber=regNum;
+    if(model)d.vehicleModel=model;
+    // Also update vehicleNumber for backward compat
+    if(regNum)d.vehicleNumber=regNum;
+    await db.ref('drivers').set(drivers);
+    me.vehicleRegNumber=regNum;me.vehicleModel=model;me.vehicleNumber=regNum;
+    const save=JSON.parse(localStorage.getItem('ecDriver')||'{}');
+    save.vehicleRegNumber=regNum;save.vehicleModel=model;save.vehicleNumber=regNum;
+    localStorage.setItem('ecDriver',JSON.stringify(save));
   }
+  renderDocUploads();renderProfile();
+  showToast('Vehicle info saved ✅','ok');
 };
 
-async function finishDelivery(d){
-  var drivers=toArr((await db.ref('drivers').once('value')).val());
-  var drv=drivers.find(function(x){return x.id===me.id;});
-  if(drv){drv.totalEarned=(drv.totalEarned||0)+(d.driverAmount||0);await db.ref('drivers').set(drivers);}
-  await db.ref('cargoDeliveries').set(allD);
-  pushAdminNotif('Delivery Completed: '+d.referenceNumber,'Driver '+me.name+' delivered to '+d.customerName+'. Route: '+d.pickupLocation+'->'+d.deliveryLocation+'. Amount: MVR '+(d.driverAmount||0));
-  $('statMod').classList.remove('show');$('statConfirm').innerHTML='<i class="fas fa-check"></i> Update';$('statConfirm').disabled=false;
-  showToast('Marked as Delivered!','ok');
-}
 
-window.openBankEdit=function(){
-  var bk=me.bank||{};$('bBankName').value=bk.bankName||'';$('bAccName').value=bk.accountName||'';$('bAccNo').value=bk.accountNumber||'';$('bankMod').classList.add('show');
-};
-$('bankClose').onclick=$('bankCancel').onclick=function(){$('bankMod').classList.remove('show')};
-$('bankConfirm').onclick=async function(){
-  var drivers=toArr((await db.ref('drivers').once('value')).val());
-  var drv=drivers.find(function(x){return x.id===me.id;});if(!drv){showToast('Error','err');return}
-  drv.bank={bankName:$('bBankName').value.trim(),accountName:$('bAccName').value.trim(),accountNumber:$('bAccNo').value.trim()};
-  me.bank=drv.bank;localStorage.setItem('ecDriver',JSON.stringify(me));
-  await db.ref('drivers').set(drivers);$('bankMod').classList.remove('show');showToast('Bank details saved','ok');
-  loadProfile();loadEarnings();
+window.uploadDoc=async function(docKey,input){
+  if(!input.files[0])return;
+  showToast('Uploading…','info');
+  const rd=new FileReader();
+  rd.onload=async ev=>{
+    const drivers=toArr((await db.ref('drivers').once('value')).val());
+    const d=drivers.find(x=>x.id===me.id);
+    if(d){d[docKey]=ev.target.result;await db.ref('drivers').set(drivers);me[docKey]=ev.target.result;}
+    renderDocUploads();renderProfile();
+    showToast('Document updated ✅ — Admin will review','ok');
+  };rd.readAsDataURL(input.files[0]);
 };
 
-function pushAdminNotif(title,msg){
-  var n={id:Date.now(),title:title,message:msg,userEmail:'all',type:'driver',timestamp:new Date().toISOString(),read:false};
-  db.ref('notifications').push(n);
+function renderProfile(){
+  // Profile photo
+  const photoImg=$('profilePhotoImg'),photoIcon=$('profilePhotoIcon');
+  if(me.profilePhoto&&photoImg){photoImg.src=me.profilePhoto;photoImg.style.display='block';if(photoIcon)photoIcon.style.display='none';}
+  else{if(photoImg)photoImg.style.display='none';if(photoIcon)photoIcon.style.display='';}
+  if($('profileName'))$('profileName').textContent=me.name||'—';
+  if($('profileContact'))$('profileContact').textContent='+960'+(me.contact||'—');
+  const badge=$('profileStatusBadge');
+  if(badge){
+    const vs=me.verificationStatus||'pending_review';
+    const cls=vs==='verified'?'status-verified':vs==='rejected'?'status-rejected':'status-pending';
+    const lbl=vs==='verified'?'✅ Verified Driver':vs==='rejected'?'❌ Rejected':'⏳ Pending Verification';
+    badge.innerHTML=`<span class="status-badge ${cls}">${lbl}</span>`;
+  }
+  renderDocUploads();
+  const docs=$('profileDocs');
+  if(docs){docs.innerHTML=`
+    <div class="doc-row"><div class="doc-ico" style="background:rgba(243,156,18,.1)"><i class="fas fa-id-card" style="color:#f39c12"></i></div><div><div class="doc-lbl">National ID / Passport</div><div class="doc-sub">${me.idDoc?'Uploaded ✓':'Not uploaded'}</div></div><span class="doc-status badge ${me.idDoc?'b-green':'b-red'}">${me.idDoc?'OK':'Missing'}</span></div>
+    <div class="doc-row"><div class="doc-ico" style="background:rgba(52,152,219,.1)"><i class="fas fa-car" style="color:#3498db"></i></div><div><div class="doc-lbl">Driver\'s Licence</div><div class="doc-sub">${me.licenceDoc?'Uploaded ✓':'Not uploaded'}</div></div><span class="doc-status badge ${me.licenceDoc?'b-green':'b-red'}">${me.licenceDoc?'OK':'Missing'}</span></div>
+    <div class="doc-row"><div class="doc-ico" style="background:rgba(155,89,182,.1)"><i class="fas fa-file-alt" style="color:#9b59b6"></i></div><div><div class="doc-lbl">Vehicle Registry</div><div class="doc-sub">${me.vehicleRegDoc?'Uploaded ✓':'Optional'}</div></div><span class="doc-status badge ${me.vehicleRegDoc?'b-green':'b-blue'}">${me.vehicleRegDoc?'OK':'Optional'}</span></div>
+    <div class="doc-row"><div class="doc-ico" style="background:rgba(39,174,96,.1)"><i class="fas fa-truck" style="color:#27ae60"></i></div><div><div class="doc-lbl">Vehicle</div><div class="doc-sub">${me.vehicle||'Not set'}${me.vehicleNumber?' · '+me.vehicleNumber:''}</div></div><span class="doc-status badge b-blue">${me.vehicle||'—'}</span></div>
+    <div class="doc-row"><div class="doc-ico" style="background:rgba(243,156,18,.1)"><i class="fas fa-star" style="color:#f39c12"></i></div><div><div class="doc-lbl">Completed Deliveries</div></div><span class="doc-status badge b-green">${me.completedDeliveries||0}</span></div>`;}
+  const bank=$('profileBank');
+  if(bank){bank.innerHTML=`
+    <div class="doc-row"><div class="doc-ico" style="background:rgba(39,174,96,.1)"><i class="fas fa-building-columns" style="color:#27ae60"></i></div><div><div class="doc-lbl">Bank</div><div class="doc-sub">${me.bankName||'—'}</div></div></div>
+    <div class="doc-row"><div class="doc-ico" style="background:rgba(39,174,96,.1)"><i class="fas fa-credit-card" style="color:#27ae60"></i></div><div><div class="doc-lbl">Account Number</div><div class="doc-sub" style="font-family:monospace;color:#27ae60;font-weight:700">${me.bankAccount||'—'}</div></div></div>`;}
 }
-function loadNotifs(){
-  var mine=allNotifs.filter(function(n){return n.driverId===me.id;}).sort(function(a,b){return new Date(b.timestamp)-new Date(a.timestamp);});
-  var unread=mine.filter(function(n){return!n.read;}).length;
-  $('nDot').className='n-dot '+(unread?'show':'');
-  if(unread)$('nDot').textContent=unread>9?'9+':unread;
-  var el=$('nList');
-  if(!mine.length){el.innerHTML='<div class="empty-s"><i class="fas fa-bell-slash"></i><p>No notifications</p></div>';return}
-  el.innerHTML=mine.map(function(n){return'<div class="n-item '+(n.read?'':'unread')+'"><div class="nt">'+n.title+'</div><div class="nm">'+n.message+'</div><div class="nd">'+timeAgo(n.timestamp)+'</div></div>';}).join('');
+
+/* ── LOGOUT ── */
+/* ═══ DEADLINE COUNTDOWN TIMER ═══ */
+let timerInterval=null;
+
+function buildDeadlineHtml(o, context){
+  // Use expressDeadline (ISO) if available, else parse from deliveryDate+deliveryTime
+  // For normal cargo show 3-5 business days ETA
+  if(o.deliveryDuration&&!o.expressDeadline&&!o.deliveryDate){
+    return`<div style="display:flex;align-items:center;gap:7px;background:rgba(39,174,96,.07);border:1px solid rgba(39,174,96,.18);border-radius:10px;padding:5px 10px;margin-bottom:.5rem">
+      <i class="fas fa-calendar-check" style="color:#27ae60;font-size:.8rem"></i>
+      <div><div style="font-size:.58rem;color:rgba(255,255,255,.35);font-family:monospace;text-transform:uppercase;letter-spacing:.5px">Expected Delivery</div>
+      <div style="font-size:.74rem;font-weight:700;color:#27ae60">${o.deliveryDuration}</div></div>
+    </div>`;
+  }
+  // expressDeadline can be "HH:MM" (time only) or ISO string
+  // Compute actual deadline: use deliveryDate if set, otherwise today/tomorrow
+  // Always recalculate from selectedHrLabel+deliveryDate for accuracy
+  // This fixes old orders that had wrong ISO stored
+  function calcExpressDeadline(order){
+    // Helper: build deadline from HH,MM + deliveryDate
+    function buildDL(h,m,dDate){
+      const base=dDate?new Date(dDate+'T00:00:00'):new Date();
+      base.setHours(h,m,0,0);
+      // Only push to tomorrow if NO deliveryDate AND time already passed
+      if(!dDate&&base<new Date())base.setDate(base.getDate()+1);
+      return base;
+    }
+    // 1. selectedHrLabel: "18:00 to 20:00" → most reliable
+    const lbl=order.selectedHrLabel||'';
+    const match=lbl.match(/(\d{1,2}):(\d{2})\s*(?:to|–|-)\s*(\d{1,2}):(\d{2})/i);
+    if(match)return buildDL(parseInt(match[3]),parseInt(match[4]),order.deliveryDate);
+
+    // 2. expressDeadline field
+    if(order.expressDeadline){
+      // HH:MM format
+      if(!order.expressDeadline.includes('T')&&!order.expressDeadline.includes('-')){
+        const pts=order.expressDeadline.split(':');
+        if(pts.length>=2)return buildDL(parseInt(pts[0]),parseInt(pts[1]),order.deliveryDate);
+      }
+      // ISO format — extract time, recombine with deliveryDate (fixes "wrong day" ISO bug)
+      if(order.expressDeadline.includes('T')){
+        const iso=new Date(order.expressDeadline);
+        if(!isNaN(iso.getTime())){
+          // If deliveryDate set, always use that date with the ISO time
+          if(order.deliveryDate){
+            return buildDL(iso.getUTCHours(),iso.getUTCMinutes(),order.deliveryDate);
+          }
+          return iso;
+        }
+      }
+    }
+    // 3. deliveryDate fallback (no time = end of day)
+    if(order.deliveryDate)return new Date(order.deliveryDate+(order.deliveryTime?'T'+order.deliveryTime+':00':'T23:59:59'));
+    return null;
+  }
+  const deadlineFinal=calcExpressDeadline(o);
+  if(!deadlineFinal||isNaN(deadlineFinal.getTime()))return'';
+  const now=new Date();
+  const diffMs=deadlineFinal-now;
+  const startTime=o.assignedAt?new Date(o.assignedAt):now;
+  const totalMs=deadlineFinal-startTime;
+  const elapsed=now-startTime;
+  const pct=Math.max(0,Math.min(100,(elapsed/totalMs)*100));
+
+  if(diffMs<0){
+    return`<div class="deadline-timer urgent">
+      <i class="fas fa-exclamation-triangle" style="color:#e74c3c;font-size:.8rem"></i>
+      <div style="flex:1"><div class="timer-digits">OVERDUE</div><div style="font-size:.58rem;color:rgba(255,255,255,.4)">Deadline: ${o.selectedHrLabel||o.deliveryDate||'—'}</div></div>
+    </div>`;
+  }
+
+  const hrs=Math.floor(diffMs/3600000);
+  const mins=Math.floor((diffMs%3600000)/60000);
+  const secs=Math.floor((diffMs%60000)/1000);
+  const timeStr=hrs>0?`${hrs}h ${mins}m`:`${mins}m ${secs}s`;
+  const cls=diffMs<3600000?'urgent':diffMs<10800000?'warn':'ok';
+  const icon=cls==='urgent'?'fa-fire':cls==='warn'?'fa-hourglass-half':'fa-clock';
+  const label=context==='mine'?'Time Remaining':'Must deliver by';
+
+  return`<div class="deadline-timer ${cls}" id="timer_${o.id}">
+    <i class="fas ${icon}" style="font-size:.82rem"></i>
+    <div style="flex:1">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:.58rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">${label}</div>
+        <div class="timer-digits" id="timerDigits_${o.id}">${timeStr}</div>
+      </div>
+      <div style="height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:4px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(100,pct)}%;background:${cls==='urgent'?'#e74c3c':cls==='warn'?'#f39c12':'#27ae60'};border-radius:2px;transition:width .5s"></div>
+      </div>
+      <div style="font-size:.6rem;color:rgba(255,255,255,.3);margin-top:2px">Deadline: ${o.deliveryDate}${o.deliveryTime?' at '+o.deliveryTime:''}</div>
+    </div>
+  </div>`;
 }
-$('nBtn').onclick=function(){
-  $('nPanel').classList.add('open');
-  var mine=allNotifs.filter(function(n){return n.driverId===me.id&&!n.read;});
-  mine.forEach(function(n){n.read=true;});
-  if(mine.length)db.ref('driverNotifications').set(allNotifs);
-  loadNotifs();
-};
-$('nClose').onclick=function(){$('nPanel').classList.remove('open')};
-$('nClearAll').onclick=function(){
-  var mine=allNotifs.filter(function(n){return n.driverId===me.id;});
-  allNotifs=allNotifs.filter(function(n){return n.driverId!==me.id;});
-  db.ref('driverNotifications').set(allNotifs);
-  loadNotifs();
-  $('nPanel').classList.remove('open');
-};
-window.openSlipView=function(src){$('slipViewImg').src=src;$('slipViewAmt').textContent='';$('slipViewDate').textContent='';$('slipViewMod').classList.add('show');};
-$('slipViewClose').onclick=$('slipViewClose2').onclick=function(){$('slipViewMod').classList.remove('show')};
-function doLogout(){localStorage.removeItem('ecDriver');me=null;location.reload();}
+
+function startLiveTimers(){
+  if(timerInterval)clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    const mine=allOrders.filter(o=>String(o.assignedDriverId)===String(me?.id)&&o.status!=='Delivered');
+    mine.forEach(o=>{
+      const el=document.getElementById('timerDigits_'+o.id);
+      if(!el)return;
+      // Use expressDeadline ISO if available, else build from deliveryDate+deliveryTime
+      // Recalculate from selectedHrLabel for accuracy (fixes old stored deadlines)
+      let deadline=null;
+      const lbl2=o.selectedHrLabel||'';
+      const m2=lbl2.match(/(\d{1,2}):(\d{2})\s*(?:to|–|-)\s*(\d{1,2}):(\d{2})/i);
+      if(m2){const b=o.deliveryDate?new Date(o.deliveryDate+'T00:00:00'):new Date();b.setHours(parseInt(m2[3]),parseInt(m2[4]),0,0);if(!o.deliveryDate&&b<new Date())b.setDate(b.getDate()+1);deadline=b;}
+      else if(o.expressDeadline){
+        if(o.expressDeadline.includes('T'))deadline=new Date(o.expressDeadline);
+        else{const pts=o.expressDeadline.split(':');const b=o.deliveryDate?new Date(o.deliveryDate+'T00:00:00'):new Date();b.setHours(parseInt(pts[0]),parseInt(pts[1]),0,0);if(!o.deliveryDate&&b<new Date())b.setDate(b.getDate()+1);deadline=b;}
+      } else if(o.deliveryDate){deadline=new Date(o.deliveryDate+(o.deliveryTime?'T'+o.deliveryTime+':00':'T23:59:59'));}
+      if(!deadline||isNaN(deadline.getTime()))return;
+      const diffMs=deadline-new Date();
+      if(diffMs < -7200000){// 2hrs overdue — hide timer entirely
+        const wrap=document.getElementById('timer_'+o.id);if(wrap)wrap.style.display='none';return;}
+      if(diffMs<0){el.textContent='OVERDUE';el.style.color='#e74c3c';return;}
+      const hrs=Math.floor(diffMs/3600000);
+      const mins=Math.floor((diffMs%3600000)/60000);
+      const secs=Math.floor((diffMs%60000)/1000);
+      el.textContent=hrs>0?`${hrs}h ${mins}m ${secs}s`:`${mins}m ${secs}s`;
+      // Urgent pulse if under 1 hour
+      const timer=document.getElementById('timer_'+o.id);
+      if(timer&&diffMs<3600000){timer.className='deadline-timer urgent';}
+      else if(timer&&diffMs<10800000){timer.className='deadline-timer warn';}
+    });
+  },1000);
+}
+
+function doLogout(){localStorage.removeItem('ecDriver');me=null;if(timerInterval)clearInterval(timerInterval);$('driverApp').style.display='none';$('authScreen').classList.add('show');}
 </script>
 </body>
 </html>
