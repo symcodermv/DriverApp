@@ -355,7 +355,7 @@ html,body{max-width:100vw;-webkit-tap-highlight-color:transparent}
           </div>
         </div>
         <div class="fg">
-          <label>Vehicle Registry Document <span style="color:#e74c3c;font-size:.7rem">*Required</span></label>
+          <label>Vehicle Registry Document <span style="color:rgba(255,255,255,.4);font-size:.7rem">(optional — can upload later)</span></label>
           <div class="upload-zone" id="regUploadZone">
             <input type="file" id="regUpload" accept="image/*,application/pdf">
             <i class="fas fa-file-alt" style="color:#9b59b6"></i>
@@ -752,13 +752,28 @@ $('regBtn').onclick=async()=>{
   if(!idFile){showMsg('regMsg','Upload your ID / Passport photo','err');return;}
   if(!licFile){showMsg('regMsg','Upload your Driver\'s Licence','err');return;}
   const regFile=$('regUpload')?.files[0];
-  if(!regFile){showMsg('regMsg','Upload your Vehicle Registry document','err');return;}
+  // Vehicle registry optional at registration — can upload later in profile
   $('regBtn').disabled=true;$('regBtn').innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Registering…';
   try{
     const existing=toArr((await db.ref('drivers').once('value')).val());
     if(existing.find(x=>x.contact===contact)){showMsg('regMsg','Contact number already registered','err');return;}
     // Convert docs to base64
-    const toB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f);});
+    // Compress image to max 600px and 0.7 quality to avoid Firebase size limits
+    const toB64=f=>new Promise((res,rej)=>{
+      const img=new Image();
+      const url=URL.createObjectURL(f);
+      img.onload=()=>{
+        const MAX=600;
+        let w=img.width,h=img.height;
+        if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+        const c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        URL.revokeObjectURL(url);
+        res(c.toDataURL('image/jpeg',0.7));
+      };
+      img.onerror=rej;
+      img.src=url;
+    });
     const regFile2=$('regUpload')?.files[0];
     const [idB64,licB64,regB64]=await Promise.all([toB64(idFile),toB64(licFile),regFile2?toB64(regFile2):Promise.resolve('')]);
     const vehicleNum=($('rVehicleNum')?.value||'').trim();
@@ -772,7 +787,13 @@ $('regBtn').onclick=async()=>{
     TCIDS.forEach(cid=>fetch(`https://api.telegram.org/bot${TBOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:cid,text:msg})}).catch(()=>{}));
     showMsg('regMsg','Registration submitted! Admin will verify your documents within 24 hours. ✅','ok');
     $('tLogin').click();
-  }catch(e){showMsg('regMsg','Registration failed: '+e.message,'err');}
+  }catch(e){
+    const msg=e.message||'';
+    if(msg.includes('size')||msg.includes('large')||msg.includes('limit'))
+      showMsg('regMsg','Photos too large. Please use smaller images and try again.','err');
+    else
+      showMsg('regMsg','Registration failed: '+msg,'err');
+  }
   finally{$('regBtn').disabled=false;$('regBtn').innerHTML='<i class="fas fa-user-plus"></i> Register as Driver';}
 };
 
