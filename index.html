@@ -92,6 +92,7 @@ body{background:#0a0f1e;min-height:100vh;color:white;overflow-x:hidden}
 /* Bottom nav */
 .mob-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#141b2b;border-top:1px solid #253241;padding:7px 0 max(10px,env(safe-area-inset-bottom));z-index:300}
 .m-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:rgba(255,255,255,.35);font-size:.56rem;font-weight:600;cursor:pointer;padding:2px;border:none;background:none;font-family:inherit}
+@keyframes tabFlash{0%,100%{color:rgba(255,255,255,.35)}50%{color:#f39c12;transform:scale(1.15)}}
 .m-tab i{font-size:1rem}
 .m-tab.active{color:#f39c12}
 
@@ -266,6 +267,8 @@ body{background:#0a0f1e;min-height:100vh;color:white;overflow-x:hidden}
 .deadline-timer.ok .timer-digits{color:#27ae60}
 .deadline-timer.warn .timer-digits{color:#f39c12}
 .deadline-timer.urgent .timer-digits{color:#e74c3c}
+/* New order banner */
+@keyframes bannerIn{from{transform:translateX(-50%) translateY(-20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
 /* Notification dot */
 .n-dot{background:#e74c3c;color:white;border-radius:50%;min-width:16px;height:16px;padding:0 3px;font-size:.52rem;font-weight:700;display:none;align-items:center;justify-content:center;position:absolute;top:-3px;right:-3px;border:2px solid #141b2b}
 .n-dot.show{display:flex}
@@ -807,11 +810,77 @@ function initApp(){
   db.ref('driverPayments').on('value',snap=>{allDriverPayments=toArr(snap.val()).filter(p=>p.driverId===me.id);renderEarnings();});
   db.ref('driverNotifications/'+me.id).on('value',snap=>{allNotifs=toArr(snap.val());renderNotifs();updateNotifDot();});
   db.ref('driverSettings').on('value',snap=>{driverSettings=snap.val()||{ratePerDelivery:50};});
-  // Refresh me from DB in case admin updated status
+  // Refresh me from DB
   db.ref('drivers').once('value').then(snap=>{const drivers=toArr(snap.val());const updated=drivers.find(d=>d.id===me.id);if(updated){me=updated;localStorage.setItem('ecDriver',JSON.stringify(me));renderProfile();}});
   renderProfile();renderDocUploads();
   // Nav
   document.querySelectorAll('.m-tab[data-s]').forEach(b=>b.addEventListener('click',function(){switchTab(this.dataset.s);}));
+  // Start order alert system
+  initOrderAlerts();
+}
+
+/* ═══ ORDER ALERT SYSTEM — Sound + Vibration ═══ */
+let prevOrderCount=-1;
+let audioCtx=null;
+
+function getAudioCtx(){
+  if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playNewOrderSound(){
+  try{
+    const ctx=getAudioCtx();
+    // Play 3 rising beeps
+    [0,0.25,0.5].forEach((delay,i)=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.type='sine';
+      osc.frequency.setValueAtTime(520+i*180,ctx.currentTime+delay);
+      gain.gain.setValueAtTime(0,ctx.currentTime+delay);
+      gain.gain.linearRampToValueAtTime(0.4,ctx.currentTime+delay+0.05);
+      gain.gain.linearRampToValueAtTime(0,ctx.currentTime+delay+0.22);
+      osc.start(ctx.currentTime+delay);
+      osc.stop(ctx.currentTime+delay+0.25);
+    });
+  }catch(e){console.warn('Sound failed:',e);}
+}
+
+function vibrateDevice(){
+  try{
+    if('vibrate' in navigator){
+      // 3 short vibrations: buzz buzz buzz
+      navigator.vibrate([150,80,150,80,300]);
+    }
+  }catch(e){}
+}
+
+function showNewOrderBanner(count){
+  // Remove existing banner
+  const existing=document.getElementById('newOrderBanner');
+  if(existing)existing.remove();
+
+  const banner=document.createElement('div');
+  banner.id='newOrderBanner';
+  banner.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:5000;background:linear-gradient(135deg,#27ae60,#2ecc71);color:white;border-radius:22px;padding:10px 20px;font-weight:800;font-size:.85rem;box-shadow:0 6px 24px rgba(39,174,96,.5);cursor:pointer;display:flex;align-items:center;gap:8px;animation:bannerIn .3s ease;white-space:nowrap';
+  banner.innerHTML='<i class="fas fa-box-open" style="font-size:1.1rem"></i> '+count+' New Order'+(count>1?'s':'')+' Available! <i class="fas fa-arrow-right"></i>';
+  banner.onclick=function(){switchTab('sOrders');banner.remove();};
+  document.body.appendChild(banner);
+  setTimeout(()=>{if(banner.parentElement){banner.style.opacity='0';banner.style.transition='opacity .5s';setTimeout(()=>banner.remove(),500);}},4000);
+}
+
+function initOrderAlerts(){
+  // Unlock audio on first user interaction
+  document.addEventListener('touchstart',function unlock(){
+    try{getAudioCtx();}catch(e){}
+    document.removeEventListener('touchstart',unlock);
+  },{once:true});
+  document.addEventListener('click',function unlock(){
+    try{getAudioCtx();}catch(e){}
+    document.removeEventListener('click',unlock);
+  },{once:true});
 }
 
 /* ── NAVIGATION ── */
@@ -838,6 +907,15 @@ function renderAvailableOrders(){
     // Show all unassigned paid orders regardless of status
     return true;
   });
+  // ── Alert on new orders ──
+  if(prevOrderCount>=0 && available.length > prevOrderCount){
+    const newCount=available.length-prevOrderCount;
+    playNewOrderSound();
+    vibrateDevice();
+    showNewOrderBanner(available.length);
+  }
+  prevOrderCount=available.length;
+
   if(me.status!=='active'||me.verificationStatus!=='verified'){
     el.innerHTML=`<div class="card" style="text-align:center;padding:1.5rem">
       <i class="fas fa-hourglass-half" style="font-size:2rem;color:#f39c12;margin-bottom:.75rem;display:block"></i>
@@ -1539,6 +1617,105 @@ function startLiveTimers(){
       else if(timer&&diffMs<10800000){timer.className='deadline-timer warn';}
     });
   },1000);
+}
+
+/* ═══ NEW ORDER NOTIFICATION SYSTEM ═══ */
+
+// Request notification permission on app start
+function initNotifications(){
+  if('Notification' in window&&Notification.permission==='default'){
+    Notification.requestPermission().then(p=>{notifGranted=p==='granted';});
+  } else if(Notification.permission==='granted'){notifGranted=true;}
+}
+
+// Create AudioContext lazily (needs user gesture first)
+function getAudioCtx(){
+  if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+  return audioCtx;
+}
+
+// Unlock audio on first user touch
+document.addEventListener('touchstart',function unlockAudio(){
+  getAudioCtx();
+  document.removeEventListener('touchstart',unlockAudio);
+},{once:true});
+document.addEventListener('click',function unlockAudio(){
+  getAudioCtx();
+  document.removeEventListener('click',unlockAudio);
+},{once:true});
+
+// Play notification sound
+function playNewOrderSound(){
+  try{
+    const ctx=getAudioCtx();if(!ctx)return;
+    if(ctx.state==='suspended')ctx.resume();
+    const t=ctx.currentTime;
+    // Three ascending beeps like a delivery alert
+    [[t,     880, 0.15],
+     [t+0.18,1100,0.15],
+     [t+0.36,1320,0.2 ]].forEach(([when,freq,dur])=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.type='sine';osc.frequency.value=freq;
+      gain.gain.setValueAtTime(0.4,when);
+      gain.gain.exponentialRampToValueAtTime(0.001,when+dur);
+      osc.start(when);osc.stop(when+dur+0.05);
+    });
+  }catch(e){}
+}
+
+// Vibrate phone
+function vibratePhone(){
+  try{
+    if('vibrate' in navigator){
+      // Pattern: buzz-pause-buzz-pause-long buzz
+      navigator.vibrate([200,100,200,100,400]);
+    }
+  }catch(e){}
+}
+
+// Show browser notification
+function showOrderNotification(order){
+  if(!notifGranted)return;
+  try{
+    const isAir=order.isAir||order.deliveryMode==='air';
+    const route=(isAir?'Male → '+(order.airDestination||'—'):((order.pickupLocation||'—')+' → '+(order.deliveryLocation||'—')));
+    const n=new Notification('🚚 New Order Available!',{
+      body:`${order.cargoType||'Cargo'} · ${route}\nEarn: MVR ${driverSettings?.ratePerDelivery||50}`,
+      icon:'/favicon.ico',
+      badge:'/favicon.ico',
+      tag:'new-order',
+      requireInteraction:false,
+      silent:false
+    });
+    n.onclick=function(){window.focus();switchTab('sOrders');n.close();};
+    setTimeout(()=>n.close(),8000);
+  }catch(e){}
+}
+
+// Check for new orders and trigger alert
+function checkNewOrders(available){
+  const count=available.length;
+  if(count>prevAvailableCount&&prevAvailableCount>=0){
+    const newOrders=count-prevAvailableCount;
+    // Vibrate + sound + notification
+    vibratePhone();
+    playNewOrderSound();
+    // Show toast
+    showToast(`🚚 ${newOrders} new order${newOrders>1?'s':''} available!`,'ok');
+    // Show browser notification if app not focused
+    if(document.hidden&&available[0]){
+      showOrderNotification(available[0]);
+    }
+    // Flash the Orders tab
+    const ordersTab=document.querySelector('[data-s="sOrders"]');
+    if(ordersTab){
+      ordersTab.style.animation='tabFlash .4s 3';
+      setTimeout(()=>ordersTab.style.animation='',1200);
+    }
+  }
+  prevAvailableCount=count;
 }
 
 function doLogout(){localStorage.removeItem('ecDriver');me=null;if(timerInterval)clearInterval(timerInterval);$('driverApp').style.display='none';$('authScreen').classList.add('show');}
