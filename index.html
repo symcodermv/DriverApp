@@ -312,68 +312,52 @@ html,body{max-width:100vw;-webkit-tap-highlight-color:transparent}
 
       <!-- REGISTER -->
       <div class="pane" id="pReg">
-        <div id="regMsg"></div>
-        <div class="fr">
-          <div class="fg"><label>Full Name</label><input class="fi" type="text" id="rName" placeholder="Full name"></div>
+
+        <!-- STEP 1: Basic Info -->
+        <div id="regStep1">
+          <div id="regMsg"></div>
+          <div class="fg"><label>Full Name</label><input class="fi" type="text" id="rName" placeholder="Your full name"></div>
           <div class="fg"><label>Contact Number</label><input class="fi" type="tel" id="rContact" placeholder="7XXXXXXX" inputmode="numeric"></div>
-        </div>
-        <div class="fr">
-          <div class="fg"><label>Password</label><input class="fi" type="password" id="rPwd" placeholder="Password"></div>
-          <div class="fg"><label>Confirm Password</label><input class="fi" type="password" id="rCfm" placeholder="Repeat"></div>
-        </div>
-        <div class="fg"><label>Email (optional)</label><input class="fi" type="email" id="rEmail" placeholder="email@example.com"></div>
-        <div class="fg">
-          <label><i class="fas fa-truck" style="color:#f39c12;margin-right:5px"></i>Vehicle Type</label>
-          <div id="vehicleGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:.3rem"></div>
-          <input type="hidden" id="rVehicle">
-        </div>
-        <div class="fr">
-          <div class="fg"><label>Vehicle Number Plate</label><input class="fi" type="text" id="rVehicleNum" placeholder="e.g. PL-1234"></div>
-          <div class="fg"><label>Bank Account Number</label><input class="fi" type="text" id="rAccount" placeholder="BML / MIB account number"></div>
-        </div>
-        <div class="fg"><label>Bank Name</label><select class="fi" id="rBank">
-          <option value="">Select bank</option>
-          <option value="BML">Bank of Maldives (BML)</option>
-          <option value="MIB">Maldives Islamic Bank (MIB)</option>
-          <option value="SBI">State Bank of India (SBI)</option>
-          <option value="HDFC">HDFC Bank</option>
-          <option value="Other">Other</option>
-        </select></div>
-        <hr style="border-color:rgba(255,255,255,.08);margin:.5rem 0 .85rem">
-        <div style="font-size:.72rem;color:rgba(255,255,255,.45);margin-bottom:.65rem;font-weight:600"><i class="fas fa-id-card" style="color:#f39c12;margin-right:5px"></i>Identity Documents (Required for Verification)</div>
-        <div class="fg">
-          <label>National ID / Passport Photo</label>
-          <div class="upload-zone" id="idUploadZone">
-            <input type="file" id="idUpload" accept="image/*">
-            <i class="fas fa-id-card"></i>
-            <span id="idUploadLbl">Tap to upload ID / Passport</span>
+          <div class="fg"><label>Email <span style="color:rgba(255,255,255,.35);font-size:.7rem">(optional)</span></label><input class="fi" type="email" id="rEmail" placeholder="email@example.com"></div>
+          <div class="fr">
+            <div class="fg"><label>Password</label><input class="fi" type="password" id="rPwd" placeholder="Password"></div>
+            <div class="fg"><label>Confirm</label><input class="fi" type="password" id="rCfm" placeholder="Repeat"></div>
           </div>
-        </div>
-        <div class="fg">
-          <label>Driver's Licence Photo</label>
-          <div class="upload-zone" id="licUploadZone">
-            <input type="file" id="licUpload" accept="image/*">
-            <i class="fas fa-car"></i>
-            <span id="licUploadLbl">Tap to upload Driver's Licence</span>
+          <div style="background:rgba(243,156,18,.07);border:1px solid rgba(243,156,18,.2);border-radius:12px;padding:.7rem;margin-bottom:.75rem;font-size:.71rem;color:rgba(255,255,255,.5);line-height:1.6">
+            <i class="fas fa-shield-halved" style="color:#f39c12;margin-right:5px"></i>An OTP will be sent to your number to verify before registering.
           </div>
+          <button class="btn btn-gold" id="sendOtpBtn" onclick="sendOtp()"><i class="fas fa-sms"></i> Send OTP</button>
         </div>
-        <div class="fg">
-          <label>Vehicle Registry Document <span style="color:rgba(255,255,255,.4);font-size:.7rem">(optional — can upload later)</span></label>
-          <div class="upload-zone" id="regUploadZone">
-            <input type="file" id="regUpload" accept="image/*,application/pdf">
-            <i class="fas fa-file-alt" style="color:#9b59b6"></i>
-            <span id="regUploadLbl">Tap to upload Vehicle Registry</span>
+
+        <!-- STEP 2: OTP Verification -->
+        <div id="regStep2" style="display:none">
+          <div id="otpMsg"></div>
+          <div style="text-align:center;margin-bottom:1rem">
+            <div style="width:56px;height:56px;background:rgba(39,174,96,.12);border:2px solid rgba(39,174,96,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .65rem">
+              <i class="fas fa-mobile-screen-button" style="color:#27ae60;font-size:1.4rem"></i>
+            </div>
+            <div style="font-weight:700;color:white;font-size:.95rem">Enter OTP</div>
+            <div id="otpSentTo" style="font-size:.72rem;color:rgba(255,255,255,.4);margin-top:3px"></div>
           </div>
-        </div>
-        <div class="fg">
-          <label>Vehicle Photo <span style="color:rgba(255,255,255,.35);font-size:.68rem">(optional)</span></label>
-          <div class="upload-zone" id="vehPhotoZone">
-            <input type="file" id="vehPhotoUpload" accept="image/*">
-            <i class="fas fa-car" style="color:#3498db"></i>
-            <span id="vehPhotoLbl">Tap to upload vehicle photo</span>
+          <div class="fg" style="margin-bottom:.75rem">
+            <input class="fi" type="number" id="otpInput" placeholder="Enter 6-digit OTP" inputmode="numeric" maxlength="6" style="font-size:1.3rem;font-family:monospace;text-align:center;letter-spacing:6px;border-color:rgba(39,174,96,.4)">
           </div>
+          <button class="btn btn-gold" onclick="verifyOtp()" style="margin-bottom:.5rem"><i class="fas fa-check-circle"></i> Verify & Register</button>
+          <button onclick="resendOtp()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);border-radius:35px;padding:9px;font-size:.75rem;cursor:pointer;font-family:inherit"><i class="fas fa-rotate-right" style="margin-right:5px"></i>Resend OTP</button>
+          <div style="margin-top:.5rem;text-align:center"><button onclick="document.getElementById('regStep1').style.display='';document.getElementById('regStep2').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,.3);font-size:.7rem;cursor:pointer;font-family:inherit">← Back</button></div>
         </div>
-        <button class="btn btn-gold" id="regBtn"><i class="fas fa-user-plus"></i> Register as Driver</button>
+
+        <!-- Hidden fields for compatibility -->
+        <input type="hidden" id="rVehicle" value="">
+        <input type="hidden" id="rVehicleNum" value="">
+        <input type="hidden" id="rAccount" value="">
+        <input type="hidden" id="rBank" value="">
+        <input type="hidden" id="idUpload" style="display:none">
+        <input type="hidden" id="licUpload" style="display:none">
+        <input type="hidden" id="regUpload" style="display:none">
+        <input type="hidden" id="vehPhotoUpload" style="display:none">
+        <!-- Legacy regBtn -->
+        <button id="regBtn" style="display:none"></button>
       </div>
     </div>
   </div>
@@ -395,7 +379,7 @@ html,body{max-width:100vw;-webkit-tap-highlight-color:transparent}
     </div>
     <!-- Actions -->
     <div id="statusActions"></div>
-    <button onclick="doLogout()" style="margin-top:1rem;background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);border-radius:22px;padding:8px 22px;font-size:.76rem;cursor:pointer;font-family:inherit"><i class="fas fa-sign-out-alt" style="margin-right:5px"></i>Sign Out</button>
+    <button onclick="statusLogout()" style="margin-top:1rem;background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.4);border-radius:22px;padding:8px 22px;font-size:.76rem;cursor:pointer;font-family:inherit"><i class="fas fa-sign-out-alt" style="margin-right:5px"></i>Sign Out</button>
   </div>
 </div>
 
@@ -622,35 +606,268 @@ function showStatusScreen(driver){
     $('statusCardContent').innerHTML=`<div style="font-size:.78rem;color:rgba(255,255,255,.6);line-height:1.7">Your ID or licence documents did not pass our verification. Please contact EasyCargo support or re-register with correct documents.</div>
       <div style="margin-top:.75rem;font-size:.72rem;color:#e74c3c;font-family:monospace">Contact: +960XXXXXXX</div>`;
     $('statusActions').innerHTML='';
-  } else {
-    // Pending — show RED pending screen
+  } else if(vs==='under_review'){
+    // Under Review — submitted, waiting for admin
     screen.style.display='flex';
-    $('statusIcon').style.background='rgba(231,76,60,.15)';$('statusIcon').style.border='2px solid rgba(231,76,60,.35)';$('statusIcon').innerHTML='<i class="fas fa-hourglass-half" style="color:#e74c3c"></i>';
-    $('statusTitle').textContent='Pending Verification';$('statusTitle').style.color='#e74c3c';
-    $('statusDesc').textContent='Your account is under review. Admin will verify your documents within 24 hours.';
-    $('statusCard').style.borderColor='rgba(231,76,60,.25)';$('statusCard').style.background='rgba(231,76,60,.05)';
-    $('statusCardContent').innerHTML=`<div style="margin-bottom:.85rem">
-        <div style="display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
-          <div style="width:8px;height:8px;border-radius:50%;background:#e74c3c;flex-shrink:0;animation:pendingPulse 1.5s infinite"></div>
-          <div style="font-size:.76rem;color:rgba(255,255,255,.7)">Account status: <strong style="color:#e74c3c">Pending Verification</strong></div>
+    $('statusIcon').style.background='rgba(52,152,219,.15)';
+    $('statusIcon').style.border='2px solid rgba(52,152,219,.35)';
+    $('statusIcon').innerHTML='<i class="fas fa-clock-rotate-left" style="color:#3498db;font-size:1.3rem"></i>';
+    $('statusTitle').textContent='Under Review';
+    $('statusTitle').style.color='#3498db';
+    $('statusDesc').textContent='Your documents have been submitted. Admin is reviewing your profile.';
+    $('statusCard').style.cssText='border:1.5px solid rgba(52,152,219,.25);background:rgba(52,152,219,.04);border-radius:18px;padding:1rem;width:100%;box-sizing:border-box';
+    $('statusCardContent').innerHTML=`
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;gap:10px;padding:.55rem .75rem;background:rgba(52,152,219,.08);border-radius:10px">
+          <i class="fas fa-id-card" style="color:#3498db;width:16px;text-align:center"></i>
+          <span style="font-size:.75rem;color:rgba(255,255,255,.7)">ID / Passport</span>
+          <span style="margin-left:auto;font-size:.68rem;font-weight:700;color:${driver.idDoc?'#27ae60':'#e74c3c'}">${driver.idDoc?'✓ Uploaded':'✗ Missing'}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
-          <i class="fas fa-id-card" style="color:#f39c12;width:16px;text-align:center"></i>
-          <div style="font-size:.76rem;color:rgba(255,255,255,.6)">ID / Passport: <span style="color:${driver.idDoc?'#27ae60':'#e74c3c'}">${driver.idDoc?'Uploaded ✓':'Not uploaded'}</span></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;padding:.6rem 0">
+        <div style="display:flex;align-items:center;gap:10px;padding:.55rem .75rem;background:rgba(52,152,219,.08);border-radius:10px">
           <i class="fas fa-car" style="color:#3498db;width:16px;text-align:center"></i>
-          <div style="font-size:.76rem;color:rgba(255,255,255,.6)">Driver Licence: <span style="color:${driver.licenceDoc?'#27ae60':'#e74c3c'}">${driver.licenceDoc?'Uploaded ✓':'Not uploaded'}</span></div>
+          <span style="font-size:.75rem;color:rgba(255,255,255,.7)">Driver's Licence</span>
+          <span style="margin-left:auto;font-size:.68rem;font-weight:700;color:${driver.licenceDoc?'#27ae60':'#e74c3c'}">${driver.licenceDoc?'✓ Uploaded':'✗ Missing'}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:.55rem .75rem;background:rgba(52,152,219,.08);border-radius:10px">
+          <i class="fas fa-truck" style="color:#3498db;width:16px;text-align:center"></i>
+          <span style="font-size:.75rem;color:rgba(255,255,255,.7)">Vehicle</span>
+          <span style="margin-left:auto;font-size:.68rem;font-weight:700;color:#27ae60">${driver.vehicle||'—'} · ${driver.vehicleNumber||'—'}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:.55rem .75rem;background:rgba(52,152,219,.08);border-radius:10px">
+          <i class="fas fa-building-columns" style="color:#3498db;width:16px;text-align:center"></i>
+          <span style="font-size:.75rem;color:rgba(255,255,255,.7)">Bank</span>
+          <span style="margin-left:auto;font-size:.68rem;font-weight:700;color:#27ae60">${driver.bankName||'—'} · ${driver.bankAccount||'—'}</span>
+        </div>
+        <div style="font-size:.68rem;color:rgba(255,255,255,.3);text-align:center;margin-top:.4rem;line-height:1.6">
+          <i class="fas fa-info-circle" style="margin-right:4px;color:#3498db"></i>Verification takes up to 24 hrs. You will be notified once approved.
+        </div>
+      </div>`;
+    $('statusActions').innerHTML=`
+      <button onclick="refreshStatus()" style="width:100%;background:rgba(52,152,219,.15);border:1.5px solid rgba(52,152,219,.3);color:#3498db;border-radius:22px;padding:13px;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:.5rem"><i class="fas fa-rotate-right" style="margin-right:7px"></i>Check Approval Status</button>
+      <button onclick="statusLogout()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);border-radius:22px;padding:10px;font-size:.75rem;cursor:pointer;font-family:inherit"><i class="fas fa-sign-out-alt" style="margin-right:5px"></i>Sign Out</button>`;
+  } else {
+    // Pending — show pending screen with upload forms
+    screen.style.display='flex';
+    $('statusIcon').style.background='rgba(243,156,18,.15)';
+    $('statusIcon').style.border='2px solid rgba(243,156,18,.35)';
+    $('statusIcon').innerHTML='<i class="fas fa-hourglass-half" style="color:#f39c12"></i>';
+    $('statusTitle').textContent='Complete Your Profile';
+    $('statusTitle').style.color='#f39c12';
+    $('statusDesc').textContent='Upload your documents below. Admin will verify within 24 hours.';
+    $('statusCard').style.borderColor='rgba(243,156,18,.25)';
+    $('statusCard').style.background='rgba(243,156,18,.04)';
+    $('statusCardContent').innerHTML=`
+      <!-- Rejection reason — shown in red if admin flagged issue -->
+      ${driver.rejectionReason?`
+      <div style="background:rgba(231,76,60,.1);border:2px solid rgba(231,76,60,.4);border-radius:14px;padding:.85rem 1rem;margin-bottom:1rem">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:.4rem">
+          <i class="fas fa-exclamation-triangle" style="color:#e74c3c;font-size:1rem"></i>
+          <div style="font-weight:700;color:#e74c3c;font-size:.85rem">Action Required</div>
+        </div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.85);line-height:1.6;font-weight:500">${driver.rejectionReason}</div>
+        <div style="font-size:.62rem;color:rgba(255,255,255,.35);margin-top:.4rem">Please fix the issue above and tap Save & Submit again.</div>
+      </div>`:''}
+      <!-- ID Front/Back -->
+      <div style="margin-bottom:.8rem">
+        <div style="font-size:.72rem;font-weight:700;color:white;margin-bottom:.45rem"><i class="fas fa-id-card" style="color:#f39c12;margin-right:6px"></i>National ID / Passport <span style="color:#e74c3c">*</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+          <label style="background:#1a2535;border:1.5px dashed ${driver.idDoc?'rgba(39,174,96,.4)':'rgba(243,156,18,.3)'};border-radius:12px;padding:.5rem;text-align:center;cursor:pointer;display:block;overflow:hidden">
+            ${driver.idDoc?`<img src="${driver.idDoc}" style="width:100%;height:65px;object-fit:cover;border-radius:8px;display:block;margin-bottom:4px">`:''}
+            <i class="fas fa-${driver.idDoc?'check-circle':'upload'}" style="color:${driver.idDoc?'#27ae60':'#f39c12'};font-size:${driver.idDoc?'.8rem':'1.2rem'};display:block;margin-bottom:2px"></i>
+            <div style="font-size:.6rem;color:${driver.idDoc?'#27ae60':'rgba(255,255,255,.5)'};font-weight:${driver.idDoc?'700':'400'}">${driver.idDoc?'✓ Front':'ID Front'}</div>
+            <input type="file" accept="image/*" style="display:none" onchange="uploadPendingDoc('idDoc',this)">
+          </label>
+          <label style="background:#1a2535;border:1.5px dashed ${driver.idDocBack?'rgba(39,174,96,.4)':'rgba(243,156,18,.3)'};border-radius:12px;padding:.5rem;text-align:center;cursor:pointer;display:block;overflow:hidden">
+            ${driver.idDocBack?`<img src="${driver.idDocBack}" style="width:100%;height:65px;object-fit:cover;border-radius:8px;display:block;margin-bottom:4px">`:''}
+            <i class="fas fa-${driver.idDocBack?'check-circle':'upload'}" style="color:${driver.idDocBack?'#27ae60':'#f39c12'};font-size:${driver.idDocBack?'.8rem':'1.2rem'};display:block;margin-bottom:2px"></i>
+            <div style="font-size:.6rem;color:${driver.idDocBack?'#27ae60':'rgba(255,255,255,.5)'};font-weight:${driver.idDocBack?'700':'400'}">${driver.idDocBack?'✓ Back':'ID Back'}</div>
+            <input type="file" accept="image/*" style="display:none" onchange="uploadPendingDoc('idDocBack',this)">
+          </label>
         </div>
       </div>
-      <div style="font-size:.72rem;color:rgba(255,255,255,.4);line-height:1.6">⏱ Verification takes up to 24 hours. You'll receive a notification once approved.</div>`;
-    $('statusActions').innerHTML=`<button onclick="refreshStatus()" style="width:100%;background:rgba(231,76,60,.12);border:1.5px solid rgba(231,76,60,.3);color:#e74c3c;border-radius:22px;padding:12px;font-weight:700;font-size:.84rem;cursor:pointer;font-family:inherit"><i class="fas fa-rotate-right" style="margin-right:7px"></i>Refresh Status</button>`;
+      <!-- Driver's Licence -->
+      <div style="margin-bottom:.8rem">
+        <div style="font-size:.72rem;font-weight:700;color:white;margin-bottom:.45rem"><i class="fas fa-car" style="color:#3498db;margin-right:6px"></i>Driver's Licence <span style="color:#e74c3c">*</span></div>
+        <label style="background:#1a2535;border:1.5px dashed ${driver.licenceDoc?'rgba(39,174,96,.4)':'rgba(52,152,219,.3)'};border-radius:12px;padding:.5rem;cursor:pointer;display:block;overflow:hidden">
+          ${driver.licenceDoc?`<img src="${driver.licenceDoc}" style="width:100%;height:70px;object-fit:cover;border-radius:8px;display:block;margin-bottom:5px">`:''}
+          <div style="display:flex;align-items:center;gap:8px;padding:0 .3rem">
+            <i class="fas fa-${driver.licenceDoc?'check-circle':'upload'}" style="color:${driver.licenceDoc?'#27ae60':'#3498db'};font-size:1rem"></i>
+            <div style="font-size:.72rem;color:${driver.licenceDoc?'#27ae60':'rgba(255,255,255,.6)'};font-weight:${driver.licenceDoc?'700':'400'}">${driver.licenceDoc?'✓ Licence uploaded — tap to replace':'Tap to upload licence'}</div>
+          </div>
+          <input type="file" accept="image/*" style="display:none" onchange="uploadPendingDoc('licenceDoc',this)">
+        </label>
+      </div>
+      <!-- Vehicle Type -->
+      <div style="margin-bottom:.8rem">
+        <div style="font-size:.72rem;font-weight:700;color:white;margin-bottom:.45rem"><i class="fas fa-truck" style="color:#27ae60;margin-right:6px"></i>Vehicle Type <span style="color:#e74c3c">*</span></div>
+        <div id="pendingVehicleGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"></div>
+        <input type="hidden" id="pendingVehicleVal" value="${driver.vehicle||''}">
+      </div>
+      <!-- Vehicle Number -->
+      <div style="margin-bottom:.8rem">
+        <div style="font-size:.72rem;font-weight:700;color:white;margin-bottom:.45rem"><i class="fas fa-hashtag" style="color:#f39c12;margin-right:6px"></i>Vehicle Number Plate <span style="color:#e74c3c">*</span></div>
+        <input type="text" id="pendingVehicleNum" value="${driver.vehicleNumber||''}" placeholder="e.g. PL-1234" style="width:100%;padding:9px 14px;background:#1a2535;border:1px solid rgba(243,156,18,.3);border-radius:22px;color:white;font-size:.82rem;outline:none;font-family:monospace">
+      </div>
+      <!-- Vehicle Photo (optional) -->
+      <div style="margin-bottom:.8rem">
+        <div style="font-size:.72rem;font-weight:700;color:white;margin-bottom:.45rem"><i class="fas fa-car" style="color:#9b59b6;margin-right:6px"></i>Vehicle Photo <span style="color:rgba(255,255,255,.35);font-size:.65rem">(optional)</span></div>
+        <label style="background:#1a2535;border:1.5px dashed ${driver.vehiclePhoto?'rgba(39,174,96,.4)':'rgba(155,89,182,.3)'};border-radius:12px;padding:.5rem;cursor:pointer;display:block;overflow:hidden">
+          ${driver.vehiclePhoto?`<img src="${driver.vehiclePhoto}" style="width:100%;height:70px;object-fit:cover;border-radius:8px;display:block;margin-bottom:5px">`:''}
+          <div style="display:flex;align-items:center;gap:8px;padding:0 .3rem">
+            <i class="fas fa-${driver.vehiclePhoto?'check-circle':'camera'}" style="color:${driver.vehiclePhoto?'#27ae60':'#9b59b6'};font-size:1rem"></i>
+            <div style="font-size:.72rem;color:${driver.vehiclePhoto?'#27ae60':'rgba(255,255,255,.6)'};font-weight:${driver.vehiclePhoto?'700':'400'}">${driver.vehiclePhoto?'✓ Uploaded — tap to replace':'Tap to upload vehicle photo'}</div>
+          </div>
+          <input type="file" accept="image/*" style="display:none" onchange="uploadPendingDoc('vehiclePhoto',this)">
+        </label>
+      </div>
+      <!-- Bank Details -->
+      <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:.8rem;margin-bottom:.5rem">
+        <div style="font-size:.72rem;font-weight:700;color:white;margin-bottom:.6rem"><i class="fas fa-building-columns" style="color:#27ae60;margin-right:6px"></i>Bank Details <span style="color:#e74c3c">*</span></div>
+        <div style="margin-bottom:.55rem">
+          <label style="font-size:.65rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.25rem">Bank Name</label>
+          <select id="pendingBankName" style="width:100%;padding:9px 14px;background:#1a2535;border:1px solid rgba(39,174,96,.25);border-radius:22px;color:white;font-size:.8rem;outline:none;font-family:inherit">
+            <option value="">Select bank</option>
+            <option value="BML" ${driver.bankName==='BML'?'selected':''}>Bank of Maldives (BML)</option>
+            <option value="MIB" ${driver.bankName==='MIB'?'selected':''}>Maldives Islamic Bank (MIB)</option>
+            <option value="SBI" ${driver.bankName==='SBI'?'selected':''}>State Bank of India (SBI)</option>
+            <option value="HDFC" ${driver.bankName==='HDFC'?'selected':''}>HDFC Bank</option>
+            <option value="Other" ${driver.bankName==='Other'?'selected':''}>Other</option>
+          </select>
+        </div>
+        <div style="margin-bottom:.55rem">
+          <label style="font-size:.65rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.25rem">Account Name</label>
+          <input type="text" id="pendingBankAccountName" value="${driver.bankAccountName||''}" placeholder="Account holder name" style="width:100%;padding:9px 14px;background:#1a2535;border:1px solid rgba(39,174,96,.25);border-radius:22px;color:white;font-size:.82rem;outline:none;font-family:inherit">
+        </div>
+        <div>
+          <label style="font-size:.65rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.25rem">Account Number</label>
+          <input type="text" id="pendingBankAccount" value="${driver.bankAccount||''}" placeholder="Enter account number" style="width:100%;padding:9px 14px;background:#1a2535;border:1px solid rgba(39,174,96,.25);border-radius:22px;color:white;font-size:.82rem;outline:none;font-family:monospace">
+        </div>
+      </div>
+    `;
+    // Load vehicle grid in pending screen
+    setTimeout(()=>loadPendingVehicleGrid(driver),100);
+    $('statusActions').innerHTML=`
+      <button onclick="savePendingProfile()" style="width:100%;background:#f39c12;color:#1e2a3a;border:none;border-radius:22px;padding:13px;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:.5rem"><i class="fas fa-save" style="margin-right:7px"></i>Save & Submit for Review</button>
+      <button onclick="refreshStatus()" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);border-radius:22px;padding:10px;font-size:.78rem;cursor:pointer;font-family:inherit"><i class="fas fa-rotate-right" style="margin-right:6px"></i>Refresh Status</button>
+    `;
   }
 }
 
 window.proceedToDash=function(){
   $('statusScreen').style.display='none';
   initApp();
+};
+
+function loadPendingVehicleGrid(driver){
+  const g=document.getElementById('pendingVehicleGrid');if(!g)return;
+  const vehicles=driverVehicleTypes&&driverVehicleTypes.length?driverVehicleTypes:[
+    {name:'Bicycle',icon:'fa-bicycle',color:'#27ae60'},
+    {name:'Motorcycle',icon:'fa-motorcycle',color:'#f39c12'},
+    {name:'Car',icon:'fa-car',color:'#3498db'},
+    {name:'Van',icon:'fa-van-shuttle',color:'#9b59b6'},
+    {name:'Truck',icon:'fa-truck',color:'#e67e22'},
+    {name:'Boat',icon:'fa-ship',color:'#1abc9c'}
+  ];
+  g.innerHTML=vehicles.map(v=>`<button type="button" onclick="selPendingVehicle(this,'${v.name}')" style="background:${driver.vehicle===v.name?'rgba(243,156,18,.15)':'#1e2a3a'};border:2px solid ${driver.vehicle===v.name?'#f39c12':'#2e3f55'};border-radius:12px;padding:.6rem .4rem;cursor:pointer;text-align:center;transition:.2s;font-family:inherit">
+    <i class="fas ${v.icon||'fa-truck'}" style="font-size:1.1rem;color:${v.color||'#f39c12'};display:block;margin-bottom:4px"></i>
+    <div style="font-size:.6rem;font-weight:700;color:white">${v.name}</div>
+  </button>`).join('');
+}
+window.selPendingVehicle=function(el,name){
+  document.querySelectorAll('#pendingVehicleGrid button').forEach(b=>{b.style.borderColor='#2e3f55';b.style.background='#1e2a3a';});
+  el.style.borderColor='#f39c12';el.style.background='rgba(243,156,18,.12)';
+  const inp=document.getElementById('pendingVehicleVal');if(inp)inp.value=name;
+};
+
+window.uploadPendingDoc=async function(docKey,input){
+  if(!input.files[0])return;
+  const label=input.closest('label');
+  if(label){label.style.opacity='.5';label.style.pointerEvents='none';}
+  showToast('Uploading…','info');
+  const f=input.files[0];
+  const img2=new Image();
+  const url=URL.createObjectURL(f);
+  img2.onload=async()=>{
+    const MAX=600;let w=img2.width,h=img2.height;
+    if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img2,0,0,w,h);
+    URL.revokeObjectURL(url);
+    const b64=c.toDataURL('image/jpeg',0.7);
+    // Save to Firebase
+    const drivers=toArr((await db.ref('drivers').once('value')).val());
+    const d=drivers.find(x=>String(x.id)===String(me.id));
+    if(d){d[docKey]=b64;await db.ref('drivers').set(drivers);me[docKey]=b64;
+      localStorage.setItem('ecDriver',JSON.stringify(me));}
+    showToast('Uploaded ✅','ok');
+    // Update the upload zone UI directly — show preview image
+    if(label){
+      label.style.opacity='1';label.style.pointerEvents='auto';
+      label.style.borderColor='rgba(39,174,96,.4)';
+      label.style.background='rgba(39,174,96,.05)';
+      // Replace label contents with preview
+      const lbl_inner = label.querySelector('div')||label;
+      const icon=label.querySelector('i');
+      const txt=label.querySelector('div');
+      // Add preview image at top of label
+      let preview=label.querySelector('.doc-preview');
+      if(!preview){
+        preview=document.createElement('img');
+        preview.className='doc-preview';
+        preview.style.cssText='width:100%;height:70px;object-fit:cover;border-radius:8px;display:block;margin-bottom:5px';
+        label.insertBefore(preview,label.firstChild);
+      }
+      preview.src=b64;
+      if(icon)icon.className='fas fa-check-circle';
+      if(icon)icon.style.color='#27ae60';
+      if(txt)txt.textContent='✓ Uploaded';
+      if(txt)txt.style.color='#27ae60';
+    }
+  };
+  img2.onerror=()=>{
+    if(label){label.style.opacity='1';label.style.pointerEvents='auto';}
+    showToast('Upload failed','err');
+  };
+  img2.src=url;
+};
+
+window.savePendingProfile=async function(){
+  const vehicleNum=(document.getElementById('pendingVehicleNum')?.value||'').trim();
+  const vehicle=(document.getElementById('pendingVehicleVal')?.value||'').trim();
+  if(!vehicle){showToast('Please select a vehicle type','err');return;}
+  if(!vehicleNum){showToast('Please enter vehicle number plate','err');return;}
+  if(!me.idDoc){showToast('Please upload your ID / Passport','err');return;}
+  if(!me.licenceDoc){showToast('Please upload your Driver Licence','err');return;}
+  const bankName=(document.getElementById('pendingBankName')?.value||'').trim();
+  const bankAccountName=(document.getElementById('pendingBankAccountName')?.value||'').trim();
+  const bankAccount=(document.getElementById('pendingBankAccount')?.value||'').trim();
+  if(!bankName||!bankAccount||!bankAccountName){showToast('Please enter all bank details','err');return;}
+  const drivers=toArr((await db.ref('drivers').once('value')).val());
+  const d=drivers.find(x=>x.id===me.id);
+  if(d){
+    d.vehicle=vehicle;d.vehicleNumber=vehicleNum;
+    d.bankName=bankName;d.bankAccount=bankAccount;d.bankAccountName=bankAccountName;
+    me.vehicle=vehicle;me.vehicleNumber=vehicleNum;
+    me.bankName=bankName;me.bankAccount=bankAccount;me.bankAccountName=bankAccountName;
+    await db.ref('drivers').set(drivers);
+    // Notify admin via Telegram
+    const msg=`📋 DRIVER PROFILE SUBMITTED\nName: ${me.name}\nContact: ${me.contact}\nVehicle: ${vehicle} (${vehicleNum})\nDocs: ID${me.idDoc?'✓':'✗'} Licence${me.licenceDoc?'✓':'✗'}\n⚡ Please review in Driver Accounts`;
+    TCIDS.forEach(cid=>fetch(`https://api.telegram.org/bot${TBOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:cid,text:msg})}).catch(()=>{}));
+  }
+  // Set verificationStatus to under_review
+  if(d){
+    d.verificationStatus='under_review';
+    d.submittedAt=new Date().toISOString();
+    me.verificationStatus='under_review';
+    me.submittedAt=d.submittedAt;
+    await db.ref('drivers').set(drivers);
+  }
+  // Update localStorage
+  const save=JSON.parse(localStorage.getItem('ecDriver')||'{}');
+  Object.assign(save,{vehicle,vehicleNumber:vehicleNum,bankName,bankAccount,bankAccountName,verificationStatus:'under_review'});
+  localStorage.setItem('ecDriver',JSON.stringify(save));
+  // Show under review screen
+  showStatusScreen(me);
 };
 
 window.refreshStatus=async function(){
@@ -672,7 +889,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         const fresh=arr.find(d=>d.id===me.id);
         if(fresh){
           // Update me with fresh data but keep session lean
-          me={...fresh,idDoc:undefined,licenceDoc:undefined};
+          me={...fresh}; // Keep ALL fields including uploaded docs
           const saveData={id:fresh.id,name:fresh.name,contact:fresh.contact,email:fresh.email||'',vehicle:fresh.vehicle||'',bankAccount:fresh.bankAccount||'',bankName:fresh.bankName||'',status:fresh.status||'pending',verificationStatus:fresh.verificationStatus||'pending_review',completedDeliveries:fresh.completedDeliveries||0};
           try{localStorage.setItem('ecDriver',JSON.stringify(saveData));}catch(e){}
           if(fresh.verificationStatus==='verified'&&fresh.status==='active'){
@@ -744,49 +961,172 @@ $('loginBtn').onclick=async()=>{
   }finally{$('loginBtn').disabled=false;$('loginBtn').innerHTML='<i class="fas fa-sign-in-alt"></i> Sign In';}
 };
 
-$('regBtn').onclick=async()=>{
-  const name=$('rName').value.trim(),contact=$('rContact').value.trim().replace(/^\+?960/,'').replace(/[^0-9]/g,''),pwd=$('rPwd').value,cfm=$('rCfm').value;
-  const vehicle=$('rVehicle').value,account=$('rAccount').value.trim(),bank=$('rBank').value;
-  const idFile=$('idUpload').files[0],licFile=$('licUpload').files[0];
-  if(!name||!contact||!pwd||!cfm){showMsg('regMsg','Fill all required fields','err');return;}
+/* ═══ OTP REGISTRATION SYSTEM ═══ */
+let _otpCode='';
+let _otpContact='';
+let _otpName='';
+let _otpEmail='';
+let _otpPwd='';
+
+window.sendOtp=async function(){
+  const name=$('rName').value.trim();
+  const contact=$('rContact').value.trim().replace(/^(\+?960)/,'').replace(/[^0-9]/g,'');
+  const pwd=$('rPwd').value;
+  const cfm=$('rCfm').value;
+  const email=$('rEmail').value.trim();
+
+  if(!name){showMsg('regMsg','Enter your full name','err');return;}
+  if(!contact||contact.length<7){showMsg('regMsg','Enter a valid contact number','err');return;}
+  if(!pwd){showMsg('regMsg','Enter a password','err');return;}
   if(pwd!==cfm){showMsg('regMsg','Passwords do not match','err');return;}
-  if(!vehicle){showMsg('regMsg','Select a vehicle type','err');return;}
-  if(!account||!bank){showMsg('regMsg','Enter bank account details','err');return;}
-  if(!idFile){showMsg('regMsg','Upload your ID / Passport photo','err');return;}
-  if(!licFile){showMsg('regMsg','Upload your Driver\'s Licence','err');return;}
-  const regFile=$('regUpload')?.files[0];
-  // Vehicle registry optional at registration — can upload later in profile
+  if(pwd.length<4){showMsg('regMsg','Password must be at least 4 characters','err');return;}
+
+  // Check contact not already registered
+  const existing=toArr((await db.ref('drivers').once('value')).val());
+  if(existing.find(d=>d.contact===contact)){
+    showMsg('regMsg','This contact number is already registered. Please sign in.','err');
+    return;
+  }
+
+  // Save form data
+  _otpName=name;_otpContact=contact;_otpEmail=email;_otpPwd=pwd;
+
+  // Generate 6-digit OTP
+  _otpCode=String(Math.floor(100000+Math.random()*900000));
+
+  // Send via Twilio
+  const btn=$('sendOtpBtn');
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+
+  try{
+    // Fetch Twilio config from Firebase
+    const cfgSnap=await db.ref('siteSettings/twilioConfig').once('value');
+    const cfg=cfgSnap.val()||{};
+
+    if(!cfg.sid||!cfg.token){
+      // No Twilio — skip OTP, go straight to register
+      showMsg('regMsg','','ok');
+      $('regStep1').style.display='none';
+      $('regStep2').style.display='block';
+      $('otpSentTo').textContent='OTP sent to +960'+contact+' (demo: '+_otpCode+')';
+      return;
+    }
+
+    const mvNum='960'+contact;
+    const sms='EasyCargoMV: Your driver registration OTP is '+_otpCode+'. Valid for 10 minutes. Do not share this code.';
+
+    // Call Twilio REST API directly
+    const params=new URLSearchParams();
+    params.append('To','+'+mvNum);
+    params.append('Body',sms);
+    if(cfg.msgSid)params.append('MessagingServiceSid',cfg.msgSid);
+    else params.append('From',cfg.from||'+13509005584');
+
+    const resp=await fetch('https://api.twilio.com/2010-04-01/Accounts/'+cfg.sid+'/Messages.json',{
+      method:'POST',
+      headers:{
+        'Authorization':'Basic '+btoa(cfg.sid+':'+cfg.token),
+        'Content-Type':'application/x-www-form-urlencoded'
+      },
+      body:params.toString()
+    });
+
+    if(resp.ok){
+      $('regStep1').style.display='none';
+      $('regStep2').style.display='block';
+      $('otpSentTo').textContent='OTP sent to +960'+contact;
+      $('otpInput').value='';
+      $('otpInput').focus();
+    } else {
+      const err=await resp.json();
+      showMsg('regMsg','SMS failed: '+(err.message||'Check Twilio settings'),'err');
+    }
+  }catch(e){
+    showMsg('regMsg','Error: '+e.message,'err');
+  }finally{
+    btn.disabled=false;btn.innerHTML='<i class="fas fa-sms"></i> Send OTP';
+  }
+};
+
+window.resendOtp=async function(){
+  _otpCode=String(Math.floor(100000+Math.random()*900000));
+  showMsg('otpMsg','','ok');
+  await sendOtp();
+  $('regStep1').style.display='none';
+  $('regStep2').style.display='block';
+};
+
+window.verifyOtp=async function(){
+  const entered=($('otpInput').value||'').trim();
+  if(!entered){showMsg('otpMsg','Enter the OTP','err');return;}
+  if(entered!==_otpCode){showMsg('otpMsg','Incorrect OTP. Please try again.','err');return;}
+
+  // OTP verified — proceed with registration
+  showMsg('otpMsg','✓ OTP verified! Creating account…','ok');
+  const btn=document.querySelector('#regStep2 .btn-gold');
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Registering…';}
+
+  try{
+    const drivers=toArr((await db.ref('drivers').once('value')).val());
+    const newDriver={
+      id:Date.now(),
+      name:_otpName,
+      contact:_otpContact,
+      email:_otpEmail,
+      password:_otpPwd,
+      vehicle:'',vehicleNumber:'',vehiclePhoto:'',
+      bankAccount:'',bankName:'',bankAccountName:'',
+      idDoc:'',licenceDoc:'',vehicleRegDoc:'',
+      status:'pending',
+      verificationStatus:'pending_review',
+      registeredAt:new Date().toISOString(),
+      earnings:0,completedDeliveries:0,
+      otpVerified:true
+    };
+    drivers.push(newDriver);
+    await db.ref('drivers').set(drivers);
+
+    // Notify admins via Telegram
+    const msg='🚗 NEW DRIVER REGISTERED (OTP Verified)\nName: '+_otpName+'\nContact: +960'+_otpContact+'\nStatus: Pending Verification';
+    TCIDS.forEach(cid=>fetch('https://api.telegram.org/bot'+TBOT+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:cid,text:msg})}).catch(()=>{}));
+
+    // Auto login
+    me=newDriver;
+    localStorage.setItem('ecDriver',JSON.stringify(newDriver));
+    showMsg('otpMsg','Account created! ✅','ok');
+    setTimeout(()=>{
+      $('authScreen').classList.remove('show');
+      showStatusScreen(newDriver);
+    },1000);
+  }catch(e){
+    showMsg('otpMsg','Registration failed: '+e.message,'err');
+    if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-check-circle"></i> Verify & Register';}
+  }
+};
+
+/* ═══════════════════════════════ */
+$('regBtn').onclick=async()=>{
+  const name=$('rName').value.trim();
+  const contact=$('rContact').value.trim().replace(/^\+?960/,'').replace(/[^0-9]/g,'');
+  const pwd=$('rPwd').value;
+  const cfm=$('rCfm').value;
+  if(!name){showMsg('regMsg','Enter your full name','err');return;}
+  if(!contact){showMsg('regMsg','Enter your contact number','err');return;}
+  if(!pwd){showMsg('regMsg','Enter a password','err');return;}
+  if(pwd!==cfm){showMsg('regMsg','Passwords do not match','err');return;}
+  if(pwd.length<4){showMsg('regMsg','Password must be at least 4 characters','err');return;}
+  const regFile=null;
   $('regBtn').disabled=true;$('regBtn').innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Registering…';
   try{
     const existing=toArr((await db.ref('drivers').once('value')).val());
     if(existing.find(x=>x.contact===contact)){showMsg('regMsg','Contact number already registered','err');return;}
     // Convert docs to base64
-    // Compress image to max 600px and 0.7 quality to avoid Firebase size limits
-    const toB64=f=>new Promise((res,rej)=>{
-      const img=new Image();
-      const url=URL.createObjectURL(f);
-      img.onload=()=>{
-        const MAX=600;
-        let w=img.width,h=img.height;
-        if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
-        const c=document.createElement('canvas');c.width=w;c.height=h;
-        c.getContext('2d').drawImage(img,0,0,w,h);
-        URL.revokeObjectURL(url);
-        res(c.toDataURL('image/jpeg',0.7));
-      };
-      img.onerror=rej;
-      img.src=url;
-    });
-    const regFile2=$('regUpload')?.files[0];
-    const [idB64,licB64,regB64]=await Promise.all([toB64(idFile),toB64(licFile),regFile2?toB64(regFile2):Promise.resolve('')]);
-    const vehicleNum=($('rVehicleNum')?.value||'').trim();
-    const vehPhotoFile=$('vehPhotoUpload')?.files[0];
-    const vehPhotoB64=vehPhotoFile?await toB64(vehPhotoFile):'';
-    const newDriver={id:Date.now(),name,contact,email:$('rEmail').value.trim()||'',password:pwd,vehicle,vehicleNumber:vehicleNum,vehiclePhoto:vehPhotoB64,bankAccount:account,bankName:bank,idDoc:idB64,licenceDoc:licB64,vehicleRegDoc:regB64||'',status:'pending',verificationStatus:'pending_review',registeredAt:new Date().toISOString(),earnings:0,completedDeliveries:0};
+    // No photos at registration - driver uploads from Profile later
+    const newDriver={id:Date.now(),name,contact,email:$('rEmail').value.trim()||'',password:pwd,vehicle:'',vehicleNumber:'',vehiclePhoto:'',bankAccount:'',bankName:'',idDoc:'',licenceDoc:'',vehicleRegDoc:'',status:'pending',verificationStatus:'pending_review',registeredAt:new Date().toISOString(),earnings:0,completedDeliveries:0};
     existing.push(newDriver);
     await db.ref('drivers').set(existing);
     // Notify admins via Telegram
-    const msg=`🚗 NEW DRIVER REGISTRATION\nName: ${name}\nContact: ${contact}\nVehicle: ${vehicle}\nBank: ${bank} — ${account}\nStatus: Pending Verification`;
+    const msg=`🚗 NEW DRIVER REGISTRATION\nName: ${name}\nContact: ${contact}\nStatus: Pending Verification`;
     TCIDS.forEach(cid=>fetch(`https://api.telegram.org/bot${TBOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:cid,text:msg})}).catch(()=>{}));
     showMsg('regMsg','Registration submitted! Admin will verify your documents within 24 hours. ✅','ok');
     $('tLogin').click();
@@ -939,7 +1279,16 @@ function renderAvailableOrders(){
     el.innerHTML='<div class="empty-s"><i class="fas fa-box-open"></i><p>No available orders right now.<br>Check back soon!</p></div>';
     return;
   }
-  const rate=driverSettings.ratePerDelivery||50;
+  // Check for route-specific rate
+  const routeRates=driverSettings.routeRates||[];
+  const isAirO=o.isAir||o.deliveryMode==='air';
+  const pu=isAirO?'Male (Air)':o.pickupLocation||'';
+  const de=isAirO?o.airDestination:o.deliveryLocation||'';
+  const routeMatch=routeRates.find(r=>
+    (r.pickup||'').toLowerCase()===(pu||'').toLowerCase()&&
+    (r.delivery||'').toLowerCase()===(de||'').toLowerCase()
+  );
+  const rate=routeMatch?routeMatch.rate:(driverSettings.ratePerDelivery||50);
   el.innerHTML=available.map(o=>{
     const isAir=o.isAir||o.deliveryMode==='air';
     const pickup=isAir?'Male (Air)':o.pickupLocation||'—';
@@ -1007,9 +1356,15 @@ function renderAvailableOrders(){
             </div>`:''}
           </div>
         </div>
-        ${(o.boatName||o.speedBoatName)?`<div style="display:flex;align-items:center;gap:8px">
-          <i class="fas fa-ship" style="color:#1abc9c;font-size:.72rem;width:14px;text-align:center"></i>
-          <div><span style="font-size:.6rem;color:rgba(255,255,255,.35);font-family:monospace">BOAT</span> <span style="font-size:.72rem;color:rgba(255,255,255,.7)">${o.boatName||o.speedBoatName||'—'} ${o.boatRoute?'· '+o.boatRoute:''}</span></div>
+        ${(o.boatName||o.speedBoatName)?`<div style="display:flex;align-items:flex-start;gap:8px">
+          <i class="fas fa-ship" style="color:#1abc9c;font-size:.72rem;width:14px;text-align:center;margin-top:2px"></i>
+          <div>
+            <span style="font-size:.6rem;color:rgba(255,255,255,.35);font-family:monospace">BOAT</span>
+            <div style="font-size:.76rem;font-weight:700;color:white">${o.boatName||o.speedBoatName||'—'} ${o.boatRoute?'· '+o.boatRoute:''}</div>
+            ${o.boatDeparture?`<div style="font-size:.7rem;color:#f39c12;font-weight:700;margin-top:2px"><i class="fas fa-clock" style="margin-right:4px"></i>Departs: ${o.boatDeparture}</div>`:''}
+            ${o.boatCurrentLocation?`<div style="font-size:.7rem;color:rgba(255,255,255,.6);margin-top:1px"><i class="fas fa-map-marker-alt" style="color:#e74c3c;margin-right:4px"></i>Now at: ${o.boatCurrentLocation}</div>`:''}
+            ${o.boatContact?`<a href="tel:+960${(o.boatContact||'').replace(/[^0-9]/g,'')}" style="display:inline-flex;align-items:center;gap:4px;margin-top:3px;background:rgba(39,174,96,.15);border:1px solid rgba(39,174,96,.3);border-radius:14px;padding:3px 10px;text-decoration:none;color:#27ae60;font-size:.68rem;font-weight:700"><i class="fas fa-phone" style="font-size:.65rem"></i>+960${o.boatContact}</a>`:''}
+          </div>
         </div>`:''}
         ${o.floorLevel&&o.floorLevel!=='Ground Floor'?`<div style="display:flex;align-items:center;gap:8px">
           <i class="fas fa-${o.floorLevel.toLowerCase().includes('lift')?'elevator':'stairs'}" style="color:#f39c12;font-size:.72rem;width:14px;text-align:center"></i>
@@ -1082,7 +1437,16 @@ function renderMyDeliveries(){
   if($('statDone'))$('statDone').textContent=done.length;
   setTimeout(startLiveTimers,100);
   if(!mine.length){el.innerHTML='<div class="empty-s"><i class="fas fa-route"></i><p>No deliveries yet.<br>Go take an order!</p></div>';return;}
-  const rate=driverSettings.ratePerDelivery||50;
+  // Check for route-specific rate
+  const routeRates=driverSettings.routeRates||[];
+  const isAirO=o.isAir||o.deliveryMode==='air';
+  const pu=isAirO?'Male (Air)':o.pickupLocation||'';
+  const de=isAirO?o.airDestination:o.deliveryLocation||'';
+  const routeMatch=routeRates.find(r=>
+    (r.pickup||'').toLowerCase()===(pu||'').toLowerCase()&&
+    (r.delivery||'').toLowerCase()===(de||'').toLowerCase()
+  );
+  const rate=routeMatch?routeMatch.rate:(driverSettings.ratePerDelivery||50);
   el.innerHTML=[...active,...done].map(o=>{
     const isDone=o.status==='Delivered';
     const isAir=o.isAir||o.deliveryMode==='air';
@@ -1200,7 +1564,16 @@ $('completeConfirm').onclick=async()=>{
       order.submittedByDriverId=me.id;
       await db.ref('cargoDeliveries').set(allOrders);
       // Notify admin
-      const rate=driverSettings.ratePerDelivery||50;
+      // Check for route-specific rate
+  const routeRates=driverSettings.routeRates||[];
+  const isAirO=o.isAir||o.deliveryMode==='air';
+  const pu=isAirO?'Male (Air)':o.pickupLocation||'';
+  const de=isAirO?o.airDestination:o.deliveryLocation||'';
+  const routeMatch=routeRates.find(r=>
+    (r.pickup||'').toLowerCase()===(pu||'').toLowerCase()&&
+    (r.delivery||'').toLowerCase()===(de||'').toLowerCase()
+  );
+  const rate=routeMatch?routeMatch.rate:(driverSettings.ratePerDelivery||50);
       const msg=`📸 DELIVERY PROOF SUBMITTED — NEEDS APPROVAL\nRef: ${order.referenceNumber}\nDriver: ${me.name} (+960${me.contact})\nCustomer: ${order.customerName}\nRoute: ${order.pickupLocation||'Air'} → ${order.deliveryLocation||order.airDestination||'—'}\nEarning: MVR ${rate}\n\n⚡ Admin → All Records → Approve Delivery`;
       TCIDS.forEach(cid=>fetch(`https://api.telegram.org/bot${TBOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:cid,text:msg})}).catch(()=>{}));
       $('completeMod').classList.remove('show');
@@ -1718,7 +2091,28 @@ function checkNewOrders(available){
   prevAvailableCount=count;
 }
 
-function doLogout(){localStorage.removeItem('ecDriver');me=null;if(timerInterval)clearInterval(timerInterval);$('driverApp').style.display='none';$('authScreen').classList.add('show');}
+function statusLogout(){
+  localStorage.removeItem('ecDriver');
+  me=null;
+  const screen=$('statusScreen');
+  if(screen)screen.style.display='none';
+  setTimeout(()=>$('authScreen').classList.add('show'),100);
+}
+
+function doLogout(){
+  localStorage.removeItem('ecDriver');
+  me=null;
+  if(timerInterval)clearInterval(timerInterval);
+  // Hide all screens
+  $('driverApp').style.display='none';
+  const ss=$('statusScreen');if(ss)ss.style.display='none';
+  // Show auth screen
+  const auth=$('authScreen');
+  auth.style.display='flex';
+  auth.classList.add('show');
+  // Reset to login tab
+  $('tLogin').click();
+}
 </script>
 </body>
 </html>
