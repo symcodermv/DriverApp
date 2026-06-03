@@ -437,6 +437,13 @@ html,body{max-width:100vw;-webkit-tap-highlight-color:transparent}
         </div>
       </div>
       <div id="pendingEarned" style="display:none"></div>
+      <!-- Route Earning Rates -->
+      <div class="card" id="routeRatesCard" style="margin-bottom:.75rem">
+        <div class="c-hd"><div class="c-ico" style="background:rgba(243,156,18,.1);border-color:rgba(243,156,18,.2)"><i class="fas fa-route" style="color:#f39c12"></i></div><h3>Earning Rates</h3></div>
+        <div id="driverRouteRatesList">
+          <div style="font-size:.72rem;color:rgba(255,255,255,.3);text-align:center;padding:.5rem">Loading rates…</div>
+        </div>
+      </div>
       <div class="card">
         <div class="c-hd"><div class="c-ico" style="background:rgba(39,174,96,.1);border-color:rgba(39,174,96,.2)"><i class="fas fa-list-check" style="color:#27ae60"></i></div><h3>Payment History</h3></div>
         <div id="earningsList"></div>
@@ -604,7 +611,9 @@ function showStatusScreen(driver){
     $('statusDesc').textContent='Your documents were not approved. Please contact EasyCargo support.';
     $('statusCard').style.borderColor='rgba(231,76,60,.3)';$('statusCard').style.background='rgba(231,76,60,.05)';
     $('statusCardContent').innerHTML=`<div style="font-size:.78rem;color:rgba(255,255,255,.6);line-height:1.7">Your ID or licence documents did not pass our verification. Please contact EasyCargo support or re-register with correct documents.</div>
-      <div style="margin-top:.75rem;font-size:.72rem;color:#e74c3c;font-family:monospace">Contact: +960XXXXXXX</div>`;
+      <a href="https://t.me/+9609121220" target="_blank" style="display:inline-flex;align-items:center;gap:7px;margin-top:.75rem;background:rgba(0,136,204,.15);border:1.5px solid rgba(0,136,204,.35);border-radius:22px;padding:8px 18px;text-decoration:none;color:#29b6f6;font-size:.78rem;font-weight:700">
+        <i class="fab fa-telegram" style="font-size:1rem"></i> Contact Support: +960 912 1220
+      </a>`;
     $('statusActions').innerHTML='';
   } else if(vs==='under_review'){
     // Under Review — submitted, waiting for admin
@@ -645,6 +654,65 @@ function showStatusScreen(driver){
     $('statusActions').innerHTML=`
       <button onclick="refreshStatus()" style="width:100%;background:rgba(52,152,219,.15);border:1.5px solid rgba(52,152,219,.3);color:#3498db;border-radius:22px;padding:13px;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:.5rem"><i class="fas fa-rotate-right" style="margin-right:7px"></i>Check Approval Status</button>
       <button onclick="statusLogout()" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);border-radius:22px;padding:10px;font-size:.75rem;cursor:pointer;font-family:inherit"><i class="fas fa-sign-out-alt" style="margin-right:5px"></i>Sign Out</button>`;
+  } else if(vs==='docs_expired'){
+    // Docs expired — show expired screen with targeted upload
+    screen.style.display='flex';
+    $('statusIcon').style.background='rgba(231,76,60,.15)';
+    $('statusIcon').style.border='2px solid rgba(231,76,60,.4)';
+    $('statusIcon').innerHTML='<i class="fas fa-triangle-exclamation" style="color:#e74c3c;font-size:1.3rem"></i>';
+    $('statusTitle').textContent='Document Expired';
+    $('statusTitle').style.color='#e74c3c';
+    $('statusDesc').textContent='One or more of your documents have expired. Please upload new documents.';
+    $('statusCard').style.cssText='border:1.5px solid rgba(231,76,60,.3);background:rgba(231,76,60,.04);border-radius:18px;padding:1rem;width:100%;box-sizing:border-box';
+
+    // Find which docs are expired based on expiry dates
+    const expiredDocs=[];
+    const today=new Date();
+    if(driver.idExpiry&&new Date(driver.idExpiry)<today) expiredDocs.push({key:'idDoc',backKey:'idDocBack',label:'National ID / Passport',icon:'fa-id-card',color:'#e74c3c',expiry:driver.idExpiry});
+    if(driver.licenceDocExpiry&&new Date(driver.licenceDocExpiry)<today) expiredDocs.push({key:'licenceDoc',label:"Driver's Licence",icon:'fa-car',color:'#e74c3c',expiry:driver.licenceDocExpiry});
+    if(driver.vehicleRegDocExpiry&&new Date(driver.vehicleRegDocExpiry)<today) expiredDocs.push({key:'vehicleRegDoc',label:'Vehicle Registry',icon:'fa-file-alt',color:'#e74c3c',expiry:driver.vehicleRegDocExpiry});
+
+    $('statusCardContent').innerHTML=`
+      ${driver.rejectionReason?`<div style="background:rgba(231,76,60,.1);border:2px solid rgba(231,76,60,.4);border-radius:14px;padding:.75rem;margin-bottom:.85rem">
+        <div style="font-weight:700;color:#e74c3c;font-size:.82rem;margin-bottom:.3rem"><i class="fas fa-exclamation-triangle" style="margin-right:5px"></i>Action Required</div>
+        <div style="font-size:.76rem;color:rgba(255,255,255,.8);line-height:1.6">${driver.rejectionReason}</div>
+      </div>`:''}
+      ${expiredDocs.length?expiredDocs.map(doc=>`
+        <div style="background:rgba(231,76,60,.07);border:1.5px solid rgba(231,76,60,.25);border-radius:14px;padding:.75rem;margin-bottom:.65rem">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:.55rem">
+            <i class="fas ${doc.icon}" style="color:#e74c3c;font-size:.9rem"></i>
+            <div style="flex:1">
+              <div style="font-size:.78rem;font-weight:700;color:white">${doc.label}</div>
+              <div style="font-size:.65rem;color:#e74c3c">Expired: ${new Date(doc.expiry).toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'})}</div>
+            </div>
+            <span style="background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);color:#e74c3c;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:8px">EXPIRED</span>
+          </div>
+          ${doc.key==='idDoc'?`
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.45rem">
+            <label style="background:#1a2535;border:1.5px dashed rgba(231,76,60,.35);border-radius:10px;padding:.55rem;text-align:center;cursor:pointer;display:block" id="zone_idDoc">
+              ${driver.idDoc?`<img src="${driver.idDoc}" style="width:100%;height:55px;object-fit:cover;border-radius:7px;margin-bottom:3px">`:''}
+              <i class="fas fa-upload" style="color:#e74c3c;display:block;font-size:.9rem;margin-bottom:2px"></i>
+              <div style="font-size:.6rem;color:rgba(255,255,255,.45)">New ID Front</div>
+              <input type="file" accept="image/*" style="display:none" onchange="uploadExpiredDoc('idDoc',this,'zone_idDoc')">
+            </label>
+            <label style="background:#1a2535;border:1.5px dashed rgba(231,76,60,.35);border-radius:10px;padding:.55rem;text-align:center;cursor:pointer;display:block" id="zone_idDocBack">
+              ${driver.idDocBack?`<img src="${driver.idDocBack}" style="width:100%;height:55px;object-fit:cover;border-radius:7px;margin-bottom:3px">`:''}
+              <i class="fas fa-upload" style="color:#e74c3c;display:block;font-size:.9rem;margin-bottom:2px"></i>
+              <div style="font-size:.6rem;color:rgba(255,255,255,.45)">New ID Back</div>
+              <input type="file" accept="image/*" style="display:none" onchange="uploadExpiredDoc('idDocBack',this,'zone_idDocBack')">
+            </label>
+          </div>`:`
+          <label style="background:#1a2535;border:1.5px dashed rgba(231,76,60,.35);border-radius:10px;padding:.55rem;display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:.45rem" id="zone_${doc.key}">
+            ${driver[doc.key]?`<img src="${driver[doc.key]}" style="height:45px;width:60px;object-fit:cover;border-radius:7px">`:'<i class="fas fa-upload" style="color:#e74c3c;font-size:1rem"></i>'}
+            <div style="font-size:.72rem;color:rgba(255,255,255,.5)">Upload new ${doc.label}</div>
+            <input type="file" accept="image/*,application/pdf" style="display:none" onchange="uploadExpiredDoc('${doc.key}',this,'zone_${doc.key}')">
+          </label>`}
+        </div>`).join(''):`<div style="font-size:.75rem;color:rgba(255,255,255,.4);text-align:center;padding:.75rem">No specific expired documents found. Admin will review.</div>`}
+    `;
+    $('statusActions').innerHTML=`
+      <button onclick="submitExpiredDocs()" style="width:100%;background:#e74c3c;color:white;border:none;border-radius:22px;padding:13px;font-weight:800;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:.5rem"><i class="fas fa-upload" style="margin-right:7px"></i>Submit New Documents for Review</button>
+      <button onclick="refreshStatus()" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);border-radius:22px;padding:10px;font-size:.75rem;cursor:pointer;font-family:inherit"><i class="fas fa-rotate-right" style="margin-right:5px"></i>Refresh Status</button>
+      <button onclick="statusLogout()" style="width:100%;background:transparent;border:none;color:rgba(255,255,255,.2);padding:8px;font-size:.7rem;cursor:pointer;font-family:inherit;margin-top:2px"><i class="fas fa-sign-out-alt" style="margin-right:4px"></i>Sign Out</button>`;
   } else {
     // Pending — show pending screen with upload forms
     screen.style.display='flex';
@@ -733,6 +801,7 @@ function showStatusScreen(driver){
           <input type="file" accept="image/*" style="display:none" onchange="uploadPendingDoc('vehiclePhoto',this)">
         </label>
       </div>
+
       <!-- Bank Details -->
       <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:.8rem;margin-bottom:.5rem">
         <div style="font-size:.72rem;font-weight:700;color:white;margin-bottom:.6rem"><i class="fas fa-building-columns" style="color:#27ae60;margin-right:6px"></i>Bank Details <span style="color:#e74c3c">*</span></div>
@@ -851,6 +920,7 @@ window.savePendingProfile=async function(){
   if(!vehicleNum){showToast('Please enter vehicle number plate','err');return;}
   if(!me.idDoc){showToast('Please upload your ID / Passport','err');return;}
   if(!me.licenceDoc){showToast('Please upload your Driver Licence','err');return;}
+
   if(!me.vehicleRegDoc){showToast('Please upload your Vehicle Registry Document','err');return;}
   const bankName=(document.getElementById('pendingBankName')?.value||'').trim();
   const bankAccountName=(document.getElementById('pendingBankAccountName')?.value||'').trim();
@@ -881,6 +951,82 @@ window.savePendingProfile=async function(){
   Object.assign(save,{vehicle,vehicleNumber:vehicleNum,bankName,bankAccount,bankAccountName,verificationStatus:'under_review'});
   localStorage.setItem('ecDriver',JSON.stringify(save));
   // Show under review screen
+  showStatusScreen(me);
+};
+
+window.uploadExpiredDoc=async function(docKey,input,zoneId){
+  if(!input.files[0])return;
+  const zone=document.getElementById(zoneId);
+  if(zone){zone.style.opacity='.5';zone.style.pointerEvents='none';}
+  showToast('Uploading…','info');
+  const f=input.files[0];
+  const img=new Image();
+  const url=URL.createObjectURL(f);
+  img.onload=async()=>{
+    const MAX=700;let w=img.width,h=img.height;
+    if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(url);
+    const b64=c.toDataURL('image/jpeg',0.75);
+    me[docKey]=b64;
+    // Save to Firebase
+    const drivers=toArr((await db.ref('drivers').once('value')).val());
+    const d=drivers.find(x=>String(x.id)===String(me.id));
+    if(d){d[docKey]=b64;await db.ref('drivers').set(drivers);}
+    localStorage.setItem('ecDriver',JSON.stringify(me));
+    // Update zone UI
+    if(zone){
+      zone.style.opacity='1';zone.style.pointerEvents='auto';
+      zone.style.borderColor='rgba(39,174,96,.4)';zone.style.background='rgba(39,174,96,.05)';
+      const oldImg=zone.querySelector('img');
+      if(oldImg){oldImg.src=b64;}
+      else{
+        const preview=document.createElement('img');
+        preview.style.cssText='height:55px;width:60px;object-fit:cover;border-radius:7px';
+        zone.insertBefore(preview,zone.firstChild);
+        preview.src=b64;
+      }
+      const icon=zone.querySelector('i.fa-upload');
+      if(icon){icon.className='fas fa-check-circle';icon.style.color='#27ae60';}
+      const txt=zone.querySelector('div');
+      if(txt){txt.textContent='✓ Uploaded';txt.style.color='#27ae60';}
+    }
+    showToast('Document uploaded ✅','ok');
+  };
+  img.onerror=()=>{if(zone){zone.style.opacity='1';zone.style.pointerEvents='auto';}showToast('Upload failed','err');};
+  img.src=url;
+};
+
+window.submitExpiredDocs=async function(){
+  const today=new Date();
+  const expiredKeys=[];
+  if(me.idExpiry&&new Date(me.idExpiry)<today) expiredKeys.push('idDoc','idDocBack');
+  if(me.licenceDocExpiry&&new Date(me.licenceDocExpiry)<today) expiredKeys.push('licenceDoc');
+  if(me.vehicleRegDocExpiry&&new Date(me.vehicleRegDocExpiry)<today) expiredKeys.push('vehicleRegDoc');
+
+  // Check all expired docs are uploaded
+  const missing=expiredKeys.filter(k=>!me[k]);
+  if(missing.length){showToast('Please upload all required documents first','err');return;}
+
+  const drivers=toArr((await db.ref('drivers').once('value')).val());
+  const d=drivers.find(x=>String(x.id)===String(me.id));
+  if(d){
+    // Reset expired status to under_review
+    d.verificationStatus='under_review';
+    d.status='pending';
+    d.submittedAt=new Date().toISOString();
+    delete d.rejectionReason;
+    me.verificationStatus='under_review';
+    me.submittedAt=d.submittedAt;
+    delete me.rejectionReason;
+    await db.ref('drivers').set(drivers);
+    localStorage.setItem('ecDriver',JSON.stringify(me));
+    // Notify admin
+    const msg='🔄 DRIVER RESUBMITTED EXPIRED DOCS\nName: '+me.name+'\nContact: +960'+me.contact+'\n⚡ Please re-verify in Driver Accounts';
+    TCIDS.forEach(cid=>fetch('https://api.telegram.org/bot'+TBOT+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:cid,text:msg})}).catch(()=>{}));
+  }
+  showToast('Documents submitted for review ✅','ok');
   showStatusScreen(me);
 };
 
@@ -1109,9 +1255,19 @@ window.verifyOtp=async function(){
     localStorage.setItem('ecDriver',JSON.stringify(newDriver));
     showMsg('otpMsg','Account created! ✅','ok');
     setTimeout(()=>{
-      $('authScreen').classList.remove('show');
-      showStatusScreen(newDriver);
-    },1000);
+      // Hide auth screen completely
+      const auth=$('authScreen');
+      auth.classList.remove('show');
+      auth.style.display='none';
+      auth.style.pointerEvents='none';
+      // Show status screen immediately
+      const ss=$('statusScreen');
+      if(ss)ss.style.display='flex';
+      // Small delay to ensure DOM is ready
+      requestAnimationFrame(()=>{
+        showStatusScreen(newDriver);
+      });
+    },800);
   }catch(e){
     showMsg('otpMsg','Registration failed: '+e.message,'err');
     if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-check-circle"></i> Verify & Register';}
@@ -1163,7 +1319,7 @@ function initApp(){
   db.ref('cargoDeliveries').on('value',snap=>{allOrders=toArr(snap.val());renderAvailableOrders();renderMyDeliveries();renderEarnings();});
   db.ref('driverPayments').on('value',snap=>{allDriverPayments=toArr(snap.val()).filter(p=>p.driverId===me.id);renderEarnings();});
   db.ref('driverNotifications/'+me.id).on('value',snap=>{allNotifs=toArr(snap.val());renderNotifs();updateNotifDot();});
-  db.ref('driverSettings').on('value',snap=>{driverSettings=snap.val()||{ratePerDelivery:50};});
+  db.ref('driverSettings').on('value',snap=>{driverSettings=snap.val()||{ratePerDelivery:50};renderDriverRouteRates();});
   // Refresh me from DB
   db.ref('drivers').once('value').then(snap=>{const drivers=toArr(snap.val());const updated=drivers.find(d=>d.id===me.id);if(updated){me=updated;localStorage.setItem('ecDriver',JSON.stringify(me));renderProfile();}});
   renderProfile();renderDocUploads();
@@ -1248,17 +1404,19 @@ function switchTab(s){
 
 /* ── AVAILABLE ORDERS ── */
 function renderAvailableOrders(){
-  const el=$('availableOrdersList');if(!el)return;
+  const el=$('availableOrdersList');if(!el||!me||!me.id)return;
   // Show all paid orders not yet taken by any driver (any status except Delivered)
   // Also show orders specifically assigned to THIS driver in available (so they can accept)
+  if(!me)return;
   const available=allOrders.filter(o=>{
     if(o.status==='Delivered')return false;
     if(o.paymentStatus!=='paid')return false;
-    // If assigned to this driver → show in Mine tab not here
-    if(String(o.assignedDriverId)===String(me.id))return false;
-    // If assigned to another driver → not available
-    if(o.assignedDriverId)return false;
-    // Show all unassigned paid orders regardless of status
+    if(o.assignedDriverId&&o.assignedDriverId!==0&&o.assignedDriverId!==''){
+      // Assigned to this driver - show in Mine tab
+      if(String(o.assignedDriverId)===String(me.id)||Number(o.assignedDriverId)===Number(me.id))return false;
+      // Assigned to someone else - hide
+      return false;
+    }
     return true;
   });
   // ── Alert on new orders ──
@@ -1293,18 +1451,17 @@ function renderAvailableOrders(){
     el.innerHTML='<div class="empty-s"><i class="fas fa-box-open"></i><p>No available orders right now.<br>Check back soon!</p></div>';
     return;
   }
-  // Check for route-specific rate
-  const routeRates=driverSettings.routeRates||[];
-  const isAirO=o.isAir||o.deliveryMode==='air';
-  const pu=isAirO?'Male (Air)':o.pickupLocation||'';
-  const de=isAirO?o.airDestination:o.deliveryLocation||'';
-  const routeMatch=routeRates.find(r=>
-    (r.pickup||'').toLowerCase()===(pu||'').toLowerCase()&&
-    (r.delivery||'').toLowerCase()===(de||'').toLowerCase()
-  );
-  const rate=routeMatch?routeMatch.rate:(driverSettings.ratePerDelivery||50);
+  const routeRates=driverSettings.routeRates?toArr(driverSettings.routeRates):[];
   el.innerHTML=available.map(o=>{
     const isAir=o.isAir||o.deliveryMode==='air';
+    // Calculate rate per order based on its route
+    const pu=isAir?'Male (Air)':o.pickupLocation||'';
+    const de=isAir?o.airDestination||'':o.deliveryLocation||'';
+    const routeMatch=routeRates.find(r=>
+      (r.pickup||'').toLowerCase()===(pu||'').toLowerCase()&&
+      (r.delivery||'').toLowerCase()===(de||'').toLowerCase()
+    );
+    const rate=routeMatch?Number(routeMatch.rate):(driverSettings.ratePerDelivery||50);
     const pickup=isAir?'Male (Air)':o.pickupLocation||'—';
     const delivery=isAir?o.airDestination||'—':o.deliveryLocation||'—';
         const deadlineHtml=buildDeadlineHtml(o,'available');
@@ -1443,27 +1600,27 @@ window.takeOrder=async function(orderId,ref){
 
 /* ── MY DELIVERIES ── */
 function renderMyDeliveries(){
-  const el=$('myDeliveriesList');if(!el)return;
-  const mine=allOrders.filter(o=>String(o.assignedDriverId)===String(me.id));
+  const el=$('myDeliveriesList');if(!el||!me||!me.id)return;
+  const mine=allOrders.filter(o=>{
+    if(!o.assignedDriverId)return false;
+    return String(o.assignedDriverId)===String(me.id)||Number(o.assignedDriverId)===Number(me.id);
+  });
   const active=mine.filter(o=>o.status!=='Delivered');
   const done=mine.filter(o=>o.status==='Delivered');
   if($('statActive'))$('statActive').textContent=active.length;
   if($('statDone'))$('statDone').textContent=done.length;
   setTimeout(startLiveTimers,100);
   if(!mine.length){el.innerHTML='<div class="empty-s"><i class="fas fa-route"></i><p>No deliveries yet.<br>Go take an order!</p></div>';return;}
-  // Check for route-specific rate
-  const routeRates=driverSettings.routeRates||[];
-  const isAirO=o.isAir||o.deliveryMode==='air';
-  const pu=isAirO?'Male (Air)':o.pickupLocation||'';
-  const de=isAirO?o.airDestination:o.deliveryLocation||'';
-  const routeMatch=routeRates.find(r=>
-    (r.pickup||'').toLowerCase()===(pu||'').toLowerCase()&&
-    (r.delivery||'').toLowerCase()===(de||'').toLowerCase()
-  );
-  const rate=routeMatch?routeMatch.rate:(driverSettings.ratePerDelivery||50);
+
+  const routeRates=driverSettings.routeRates?toArr(driverSettings.routeRates):[];
+
   el.innerHTML=[...active,...done].map(o=>{
     const isDone=o.status==='Delivered';
     const isAir=o.isAir||o.deliveryMode==='air';
+    const _pu=isAir?'Male (Air)':o.pickupLocation||'';
+    const _de=isAir?o.airDestination||'':o.deliveryLocation||'';
+    const _rm=routeRates.find(r=>(r.pickup||'').toLowerCase()===(_pu||'').toLowerCase()&&(r.delivery||'').toLowerCase()===(_de||'').toLowerCase());
+    const rate=_rm?Number(_rm.rate):(driverSettings.ratePerDelivery||50);
     const pickup=isAir?'Male (Air)':o.pickupLocation||'—';
     const delivery=isAir?o.airDestination||'—':o.deliveryLocation||'—';
     const statusColor=isDone?'#27ae60':'#f39c12';
@@ -1579,7 +1736,7 @@ $('completeConfirm').onclick=async()=>{
       await db.ref('cargoDeliveries').set(allOrders);
       // Notify admin
       // Check for route-specific rate
-  const routeRates=driverSettings.routeRates||[];
+  const routeRates=driverSettings.routeRates?toArr(driverSettings.routeRates):[];
   const isAirO=o.isAir||o.deliveryMode==='air';
   const pu=isAirO?'Male (Air)':o.pickupLocation||'';
   const de=isAirO?o.airDestination:o.deliveryLocation||'';
@@ -1612,6 +1769,30 @@ window.releaseOrder=async function(orderId,ref){
 };
 
 /* ── EARNINGS ── */
+function renderDriverRouteRates(){
+  const el=document.getElementById('driverRouteRatesList');
+  if(!el)return;
+  const rates=driverSettings.routeRates?toArr(driverSettings.routeRates):[];
+  if(!rates.length){
+    el.innerHTML='<div style="font-size:.72rem;color:rgba(255,255,255,.3);text-align:center;padding:.5rem">No route rates set by admin.</div>';
+    return;
+  }
+  el.innerHTML='<div style="background:rgba(0,0,0,.2);border-radius:10px;overflow:hidden">'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 90px;padding:.45rem .7rem;border-bottom:1px solid rgba(255,255,255,.06)">'
+    +'<span style="font-size:.58rem;color:rgba(255,255,255,.3);font-weight:700;text-transform:uppercase">Pickup</span>'
+    +'<span style="font-size:.58rem;color:rgba(255,255,255,.3);font-weight:700;text-transform:uppercase">Delivery</span>'
+    +'<span style="font-size:.58rem;color:rgba(255,255,255,.3);font-weight:700;text-transform:uppercase">Earn</span>'
+    +'</div>'
+    +rates.map(function(r){
+      return '<div style="display:grid;grid-template-columns:1fr 1fr 90px;align-items:center;padding:.55rem .7rem;border-bottom:1px solid rgba(255,255,255,.04)">'
+        +'<span style="font-size:.72rem;color:rgba(255,255,255,.75)"><i class="fas fa-map-marker-alt" style="color:#e74c3c;font-size:.6rem;margin-right:4px"></i>'+r.pickup+'</span>'
+        +'<span style="font-size:.72rem;color:rgba(255,255,255,.75)"><i class="fas fa-flag-checkered" style="color:#3498db;font-size:.6rem;margin-right:4px"></i>'+r.delivery+'</span>'
+        +'<span style="font-family:monospace;font-weight:900;color:#27ae60;font-size:.88rem">MVR '+r.rate+'</span>'
+        +'</div>';
+    }).join('')
+    +'</div>';
+}
+
 function renderEarnings(){
   const el=$('earningsList');
   const total=allDriverPayments.reduce((s,p)=>s+(p.amount||0),0);
